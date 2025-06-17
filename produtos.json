@@ -1,0 +1,24 @@
+[
+{
+  "id": 1,
+  "nome": "Camisa Travis",
+  "descricao": "Camisa de algodão com estampa do Travis Scott, Tam P.",
+  "preco": 370.00,
+"imagem": "https://acdn-us.mitiendanube.com/stores/001/111/699/products/camiseta-nohype-travis-scott-utopia-8baae01aab1305e23517090427997827-640-0.png"
+},
+{
+    "id": 2,
+  "nome": "Oculos Oakley Travis",
+  "descricao": "Oakley Plantaris, Tam Unc.",
+  "preco": 1999.00,
+  "imagem":"https://assets2.oakley.com/cdn-record-files-pi/468817a6-9159-4d56-9666-b0c4004f18da/96dde08c-a2a0-4ddf-b419-b18701716b36/0OO9437__943701__P21__shad__qt.png"
+
+},
+{
+     "id": 3,
+  "nome": "Jordan Travis",
+  "descricao": "Tênis Jordan x Travis, Tam 42.",
+  "preco": 7000.99,
+  "imagem":"https://elitecalçadosimport.com/cdn/shop/files/1_44e17ee0-7866-4b14-8fae-b4f58ec49a64.png?v=1721663324"
+}
+]

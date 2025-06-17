@@ -1,0 +1,54 @@
+h1{
+     font-family: 'Dancing Script', cursive;
+    text-align: center;
+    color: rgb(141, 75, 59);
+}
+.produtos h2{
+    text-align: auto;
+    color: rgb(133, 68, 52, 80%);
+    font-family: roboto;  
+    
+}
+
+#produtos{
+    display: flex;
+   
+}
+.produtos img {
+  width: 100%;
+  height: 150px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+.produtos {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 10px;
+}
+.produtos button {
+  background-color:rgb(133, 68, 52, 100%);
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  margin-top: 10px;
+  cursor: pointer;
+  border-radius: 40px;
+}
+.produtos button:hover {
+  background-color:rgba(12, 9, 2, 0.5); ;
+}
+.remover {
+   background-color:rgb(133, 68, 52, 100%);
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  margin-top: 10px;
+  cursor: pointer;
+  border-radius: 40px;
+}
+#total{
+    color: rgb(117, 45, 23);
+}
+
+  
