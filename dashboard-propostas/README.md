@@ -8,12 +8,16 @@ Dashboard de duas páginas para o Power BI: busca de uma proposta pelo `ID_propo
 
 | Arquivo | O que é |
 |---|---|
-| **[`GUIA-POWER-BI.md`](GUIA-POWER-BI.md)** | Passo a passo da montagem: modelo, visuais, posições e cuidados. **Comece por aqui.** |
+| **[`powerbi/`](powerbi/LEIA-ME.md)** | **O relatório pronto.** Projeto `.pbip` com modelo, 28 medidas e 29 visuais montados — abra `Propostas.pbip` no Power BI Desktop |
+| `GUIA-POWER-BI.md` | Passo a passo da montagem manual: modelo, visuais, posições e cuidados. Use se preferir montar do zero, ou como referência de qualquer detalhe |
 | `medidas.dax` | Todas as medidas DAX, comentadas e prontas para colar |
 | `tema-powerbi.json` | Tema do relatório (*Exibição → Temas → Procurar temas*) |
-| `dados_exemplo.csv` | 48 propostas fictícias para montar e testar antes de plugar a base real |
+| `dados_exemplo.csv` | 48 propostas fictícias, as mesmas embutidas no `.pbip` |
+| `gerar-pbip.js` · `dados.json` | Gerador do projeto Power BI e sua fonte de dados |
 | `index.html` | Protótipo navegável — abra no navegador para ver o resultado esperado |
 | `preview-*.png` | Capturas das duas páginas |
+
+> O projeto `.pbip` **não pôde ser testado aqui** — não existe Power BI neste ambiente. A estrutura está montada e todos os JSON validam; se o Desktop reclamar de algo, o `GUIA-POWER-BI.md` cobre a montagem manual completa como alternativa.
 
 ## Página 1 — Consulta
 

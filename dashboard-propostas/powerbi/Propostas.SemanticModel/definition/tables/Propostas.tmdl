@@ -1,0 +1,350 @@
+table Propostas
+	lineageTag: 680897ae-7f4c-4603-a27d-78dfdc6db374
+
+	column ID_proposta
+		dataType: string
+		lineageTag: e9798753-b20d-4151-a109-58a82990649c
+		summarizeBy: none
+		sourceColumn: ID_proposta
+
+		annotation SummarizationSetBy = Automatic
+
+	column segmento
+		dataType: string
+		lineageTag: 5901b3b5-104a-429a-a6e6-0d88467ea812
+		summarizeBy: none
+		sourceColumn: segmento
+
+		annotation SummarizationSetBy = Automatic
+
+	column volume_capturado
+		dataType: int64
+		formatString: #,0
+		lineageTag: 1aeb8cda-45fa-4f0f-aa98-f18830469eda
+		summarizeBy: sum
+		sourceColumn: volume_capturado
+
+		annotation SummarizationSetBy = Automatic
+
+	column taxa_bruta_porc
+		dataType: double
+		formatString: 0.00%
+		lineageTag: 66b629aa-7991-45c5-af50-1c91461f96a9
+		summarizeBy: none
+		sourceColumn: taxa_bruta_porc
+
+		annotation SummarizationSetBy = Automatic
+
+	column irv_final_pricing_porc
+		dataType: double
+		formatString: 0.00%
+		lineageTag: c99d953e-12ba-4aeb-a202-e8e784bbfc20
+		summarizeBy: none
+		sourceColumn: irv_final_pricing_porc
+
+		annotation SummarizationSetBy = Automatic
+
+	column proposta_convertida
+		dataType: string
+		lineageTag: 27cedf09-2594-42e7-ad2f-0c0b117f10db
+		summarizeBy: none
+		sourceColumn: proposta_convertida
+
+		annotation SummarizationSetBy = Automatic
+
+	column irv_clm
+		dataType: double
+		formatString: 0.00%
+		lineageTag: 6d697930-6878-43f2-a82c-5c0c252d177d
+		summarizeBy: none
+		sourceColumn: irv_clm
+
+		annotation SummarizationSetBy = Automatic
+
+	column mdr_clm
+		dataType: double
+		formatString: 0.00%
+		lineageTag: 4edefeb5-06fe-451b-aec0-545720affe35
+		summarizeBy: none
+		sourceColumn: mdr_clm
+
+		annotation SummarizationSetBy = Automatic
+
+	column motivo
+		dataType: string
+		lineageTag: 6c790145-676f-4b12-a6b8-e01fe6c76ba6
+		summarizeBy: none
+		sourceColumn: motivo
+
+		annotation SummarizationSetBy = Automatic
+
+	column observacao
+		dataType: string
+		lineageTag: e432487c-346a-4113-ac15-770ba01ddde4
+		summarizeBy: none
+		sourceColumn: observacao
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Faixa de Volume' =
+			SWITCH (
+			    TRUE (),
+			    Propostas[volume_capturado] < 250000, "1. Até R$ 250 mil",
+			    Propostas[volume_capturado] < 1000000, "2. R$ 250 mil - 1 mi",
+			    Propostas[volume_capturado] < 2500000, "3. R$ 1 mi - 2,5 mi",
+			    "4. Acima de R$ 2,5 mi"
+			)
+		dataType: string
+		lineageTag: cb934764-a1ba-49af-a4be-ac8a6ab7aa30
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	measure 'Volume Capturado' = SUM ( Propostas[volume_capturado] )
+		formatString: #,0
+		lineageTag: 16582504-0f2e-4c01-ab64-69af4a290692
+
+	measure 'Taxa Bruta %' =
+			VAR Peso = SUM ( Propostas[volume_capturado] )
+			RETURN
+			    IF (
+			        Peso = 0,
+			        AVERAGE ( Propostas[taxa_bruta_porc] ),
+			        DIVIDE ( SUMX ( Propostas, Propostas[volume_capturado] * Propostas[taxa_bruta_porc] ), Peso )
+			    )
+		formatString: 0.00%
+		lineageTag: 32518b88-ee92-40c1-a26e-68f90158a8dd
+
+	measure 'IRV Final Pricing %' =
+			VAR Peso = SUM ( Propostas[volume_capturado] )
+			RETURN
+			    IF (
+			        Peso = 0,
+			        AVERAGE ( Propostas[irv_final_pricing_porc] ),
+			        DIVIDE ( SUMX ( Propostas, Propostas[volume_capturado] * Propostas[irv_final_pricing_porc] ), Peso )
+			    )
+		formatString: 0.00%
+		lineageTag: 9e2b8a5f-c150-4a0a-ac4e-25f5d4e66b7d
+
+	measure 'IRV CLM %' =
+			VAR Base = FILTER ( Propostas, Propostas[proposta_convertida] = "Sim" && NOT ISBLANK ( Propostas[irv_clm] ) )
+			VAR Peso = SUMX ( Base, Propostas[volume_capturado] )
+			RETURN
+			    IF (
+			        Peso = 0,
+			        AVERAGEX ( Base, Propostas[irv_clm] ),
+			        DIVIDE ( SUMX ( Base, Propostas[volume_capturado] * Propostas[irv_clm] ), Peso )
+			    )
+		formatString: 0.00%
+		lineageTag: 5d8d17de-841d-4181-a2e7-f2e51cb5bb04
+
+	measure 'MDR CLM %' =
+			VAR Base = FILTER ( Propostas, Propostas[proposta_convertida] = "Sim" && NOT ISBLANK ( Propostas[mdr_clm] ) )
+			VAR Peso = SUMX ( Base, Propostas[volume_capturado] )
+			RETURN
+			    IF (
+			        Peso = 0,
+			        AVERAGEX ( Base, Propostas[mdr_clm] ),
+			        DIVIDE ( SUMX ( Base, Propostas[volume_capturado] * Propostas[mdr_clm] ), Peso )
+			    )
+		formatString: 0.00%
+		lineageTag: 67ffe6cc-f9ec-4b61-af31-19fc07b8b421
+
+	measure 'Situação da Proposta' =
+			VAR S = SELECTEDVALUE ( Propostas[proposta_convertida] )
+			RETURN
+			    SWITCH ( TRUE (), ISBLANK ( S ), "—", S = "Sim", "● Convertida", "● Não convertida" )
+		lineageTag: dec6837a-49f4-422c-a6ef-2a2486349d11
+
+	measure 'Cor Situação' = IF ( SELECTEDVALUE ( Propostas[proposta_convertida] ) = "Sim", "#0CA30C", "#D03B3B" )
+		lineageTag: 471333ce-9cfa-4426-a60e-454663d17bd4
+
+	measure Motivo =
+			IF (
+			    HASONEVALUE ( Propostas[ID_proposta] ),
+			    SELECTEDVALUE ( Propostas[motivo] ),
+			    "Selecione um ID de proposta"
+			)
+		lineageTag: 577087e0-31d3-4a25-a2e7-af0fb767287c
+
+	measure 'Observação' = IF ( HASONEVALUE ( Propostas[ID_proposta] ), SELECTEDVALUE ( Propostas[observacao] ), "" )
+		lineageTag: 2d45846c-dc31-4a4d-a9db-e51b8a43ca24
+
+	measure 'Desvio IRV' = IF ( NOT ISBLANK ( [IRV CLM %] ), [IRV CLM %] - [IRV Final Pricing %] )
+		formatString: 0.00%
+		lineageTag: a1779b3c-e945-445b-a50a-843f6c7a0e9b
+
+	measure 'Desvio MDR' = IF ( NOT ISBLANK ( [MDR CLM %] ), [MDR CLM %] - [Taxa Bruta %] )
+		formatString: 0.00%
+		lineageTag: 6676d398-4d8f-4732-a899-e39cb8cebbba
+
+	measure 'Desvio IRV (rótulo)' =
+			VAR D = [Desvio IRV]
+			RETURN IF ( ISBLANK ( D ), "", FORMAT ( D * 100, "+0.00;-0.00;0.00" ) & " p.p. vs. recomendado" )
+		lineageTag: 1fc007ef-31c3-406b-abc8-86b9a7979d96
+
+	measure 'Desvio MDR (rótulo)' =
+			VAR D = [Desvio MDR]
+			RETURN IF ( ISBLANK ( D ), "", FORMAT ( D * 100, "+0.00;-0.00;0.00" ) & " p.p. vs. taxa bruta" )
+		lineageTag: 3624001f-700a-4d53-ae73-0e586479fa7c
+
+	measure 'Cor Desvio IRV' =
+			VAR D = [Desvio IRV]
+			RETURN SWITCH ( TRUE (), ISBLANK ( D ), "#8996A8", D >= 0, "#0CA30C", "#D03B3B" )
+		lineageTag: 179bc28f-8419-4be5-aced-c525680922f8
+
+	measure 'Cor Desvio MDR' =
+			VAR D = [Desvio MDR]
+			RETURN SWITCH ( TRUE (), ISBLANK ( D ), "#8996A8", D >= 0, "#0CA30C", "#D03B3B" )
+		lineageTag: 8d65957e-c500-4940-acda-ad296c9ee18e
+
+	measure 'Título da Consulta' =
+			VAR Id = SELECTEDVALUE ( Propostas[ID_proposta] )
+			RETURN IF ( ISBLANK ( Id ), "Nenhuma proposta selecionada", "Proposta " & Id )
+		lineageTag: b4825796-ebef-4474-a4c1-2c82bd949f0a
+
+	measure 'Aviso Seleção' =
+			IF (
+			    NOT HASONEVALUE ( Propostas[ID_proposta] ),
+			    "Digite um ID no filtro de busca acima para carregar a proposta."
+			)
+		lineageTag: 2b53ce5d-fa3f-4ff7-a56b-3f4cde2522b1
+
+	measure 'Qtd Propostas' = COUNTROWS ( Propostas )
+		formatString: #,0
+		lineageTag: db202db2-0529-443d-a893-1a47958ce3a4
+
+	measure 'Qtd Convertidas' = CALCULATE ( COUNTROWS ( Propostas ), Propostas[proposta_convertida] = "Sim" )
+		formatString: #,0
+		lineageTag: fbcb0613-e4b1-4d2c-a6f8-18a38f4958b0
+
+	measure 'Qtd Não Convertidas' = CALCULATE ( COUNTROWS ( Propostas ), Propostas[proposta_convertida] = "Não" )
+		formatString: #,0
+		lineageTag: e5d7e00c-12f9-4a90-a584-682fc3bfc289
+
+	measure 'Taxa de Conversão %' = DIVIDE ( [Qtd Convertidas], [Qtd Propostas] )
+		formatString: 0.0%
+		lineageTag: cc480e92-1b35-4d6a-af17-98856926360c
+
+	measure 'Volume Convertido' = CALCULATE ( [Volume Capturado], Propostas[proposta_convertida] = "Sim" )
+		formatString: #,0
+		lineageTag: f1725047-2fd6-4a6f-a1c6-c54fc7b75cad
+
+	measure 'Conversão em Volume %' = DIVIDE ( [Volume Convertido], [Volume Capturado] )
+		formatString: 0.0%
+		lineageTag: 5b1a1319-1af0-4ce2-a4ec-da048a7c5582
+
+	measure 'Resumo Conversão' = [Qtd Convertidas] & " de " & [Qtd Propostas] & " propostas recomendadas foram fechadas."
+		lineageTag: 95aeb077-c291-4c69-a70a-7394dad53f6e
+
+	measure 'Spread Médio IRV (p.p.)' =
+			VAR Base = FILTER ( Propostas, Propostas[proposta_convertida] = "Sim" && NOT ISBLANK ( Propostas[irv_clm] ) )
+			RETURN AVERAGEX ( Base, Propostas[irv_clm] - Propostas[irv_final_pricing_porc] ) * 100
+		formatString: 0.00
+		lineageTag: cbcdbd20-f214-4e40-ac3c-b6266f5383b9
+
+	measure 'Rank Volume Convertidas' =
+			IF (
+			    HASONEVALUE ( Propostas[ID_proposta] ),
+			    RANKX (
+			        CALCULATETABLE (
+			            VALUES ( Propostas[ID_proposta] ),
+			            Propostas[proposta_convertida] = "Sim",
+			            ALLSELECTED ( Propostas )
+			        ),
+			        [Volume Capturado],
+			        ,
+			        DESC
+			    )
+			)
+		formatString: #,0
+		lineageTag: 5227d4ef-24df-44a0-add7-fdc9c943032e
+
+	measure 'IRV Recomendado (Top 10) %' =
+			IF (
+			    NOT ISBLANK ( [IRV CLM %] ) && [Rank Volume Convertidas] <= 10,
+			    [IRV Final Pricing %]
+			)
+		formatString: 0.00%
+		lineageTag: ce9150de-acca-43df-a76c-e9dcae4f6102
+
+	measure 'IRV CLM (Top 10) %' = IF ( [Rank Volume Convertidas] <= 10, [IRV CLM %] )
+		formatString: 0.00%
+		lineageTag: a4f69fb8-ec9c-4d9c-a7c9-d710449527f5
+
+	partition Propostas = m
+		mode: import
+		source =
+				let
+				    // ==========================================================
+				    //  TROQUE ESTA ETAPA PELA SUA FONTE DE DADOS.
+				    //  Os nomes das colunas precisam continuar iguais.
+				    //  Ex.: Origem = Sql.Database("servidor", "banco"){[Item="Propostas"]}[Data]
+				    //  Percentuais devem chegar como decimal: 1,42% = 0,0142
+				    // ==========================================================
+				    Origem = Table.FromRows(
+				        {
+				            {"PRP-24500", "Educação", 593700, 0.0142, 0.0036, "Sim", 0.0038, 0.0121, "Renegociação de MDR aceita", "Ajuste aprovado pelo comitê de pricing."},
+				            {"PRP-24507", "Combustíveis", 2678400, 0.0143, 0.0033, "Sim", 0.0027, 0.0148, "Ajuste de antecipação aprovado", "Migração agendada para o próximo ciclo de faturamento."},
+				            {"PRP-24514", "Educação", 372000, 0.0117, 0.0091, "Sim", 0.0081, 0.0108, "Aprovado no pricing recomendado", "MDR fechado 0,08 p.p. acima do recomendado."},
+				            {"PRP-24521", "Varejo", 524800, 0.0139, 0.0042, "Sim", 0.0035, 0.0135, "Contraproposta aceita pelo cliente", "Fechamento condicionado a exclusividade de 12 meses."},
+				            {"PRP-24528", "Varejo", 56400, 0.0102, 0.0067, "Sim", 0.0077, 0.0101, "Aprovado no pricing recomendado", "Fechamento condicionado a exclusividade de 12 meses."},
+				            {"PRP-24535", "Saúde", 1392200, 0.019, 0.007, "Sim", 0.0075, 0.0166, "Contraproposta aceita pelo cliente", "Cliente aceitou o pacote com antecipação automática."},
+				            {"PRP-24542", "Saúde", 4203000, 0.0208, 0.0054, "Não", null, null, "Fora do prazo de validade", "Concorrente ofereceu MDR 0,15 p.p. menor."},
+				            {"PRP-24549", "Educação", 3866000, 0.0181, 0.0086, "Sim", 0.007, 0.0156, "Renegociação de MDR aceita", "Fechamento condicionado a exclusividade de 12 meses."},
+				            {"PRP-24556", "Serviços", 136800, 0.0109, 0.0064, "Sim", 0.0058, 0.0115, "Renegociação de MDR aceita", "Fechamento condicionado a exclusividade de 12 meses."},
+				            {"PRP-24563", "Serviços", 46100, 0.0176, 0.0037, "Não", null, null, "Sem retorno do cliente", "Concorrente ofereceu MDR 0,15 p.p. menor."},
+				            {"PRP-24570", "E-commerce", 92200, 0.0131, 0.0065, "Não", null, null, "Volume declarado não comprovado", "Cliente optou por manter o adquirente atual."},
+				            {"PRP-24577", "Combustíveis", 1964300, 0.0103, 0.0028, "Não", null, null, "Sem retorno do cliente", "Volume informado divergente do extrato apresentado."},
+				            {"PRP-24584", "Alimentação", 112800, 0.0105, 0.011, "Sim", 0.0126, 0.0113, "Aprovado no pricing recomendado", "Fechamento condicionado a exclusividade de 12 meses."},
+				            {"PRP-24591", "Alimentação", 994500, 0.0204, 0.0072, "Não", null, null, "Sem retorno do cliente", "Proposta expirada sem resposta do cliente."},
+				            {"PRP-24598", "E-commerce", 290400, 0.0143, 0.0061, "Sim", 0.0047, 0.0155, "Renegociação de MDR aceita", "Fechamento condicionado a exclusividade de 12 meses."},
+				            {"PRP-24605", "E-commerce", 231500, 0.0218, 0.0069, "Não", null, null, "Volume declarado não comprovado", "Comitê de risco vetou o limite de antecipação."},
+				            {"PRP-24612", "E-commerce", 4103300, 0.0095, 0.0118, "Sim", 0.0113, 0.0087, "Contraproposta aceita pelo cliente", "Fechamento condicionado a exclusividade de 12 meses."},
+				            {"PRP-24619", "Varejo", 2468000, 0.0218, 0.0081, "Sim", 0.0069, 0.0222, "Ajuste de antecipação aprovado", "Migração agendada para o próximo ciclo de faturamento."},
+				            {"PRP-24626", "Combustíveis", 1871600, 0.0105, 0.0102, "Sim", 0.0077, 0.0113, "Renegociação de MDR aceita", "Migração agendada para o próximo ciclo de faturamento."},
+				            {"PRP-24633", "E-commerce", 2722400, 0.0169, 0.0059, "Sim", 0.0053, 0.0154, "Renegociação de MDR aceita", "MDR fechado 0,08 p.p. acima do recomendado."},
+				            {"PRP-24640", "Alimentação", 3513500, 0.0123, 0.0085, "Sim", 0.0076, 0.0111, "Ajuste de antecipação aprovado", "Cliente aceitou o pacote com antecipação automática."},
+				            {"PRP-24647", "Alimentação", 2068300, 0.0191, 0.0088, "Não", null, null, "Restrição de risco de crédito", "Contato comercial sem retorno após 3 tentativas."},
+				            {"PRP-24654", "Varejo", 58200, 0.0118, 0.0117, "Não", null, null, "Cliente desistiu da migração", "Contato comercial sem retorno após 3 tentativas."},
+				            {"PRP-24661", "Alimentação", 901600, 0.0125, 0.0098, "Sim", 0.009, 0.0115, "Aprovado no pricing recomendado", "MDR fechado 0,08 p.p. acima do recomendado."},
+				            {"PRP-24668", "Combustíveis", 45000, 0.0215, 0.012, "Não", null, null, "Fora do prazo de validade", "Cliente optou por manter o adquirente atual."},
+				            {"PRP-24675", "Alimentação", 3940500, 0.0218, 0.011, "Sim", 0.0124, 0.019, "Ajuste de antecipação aprovado", "MDR fechado 0,08 p.p. acima do recomendado."},
+				            {"PRP-24682", "Combustíveis", 641000, 0.0202, 0.0087, "Não", null, null, "Cliente desistiu da migração", "Proposta expirada sem resposta do cliente."},
+				            {"PRP-24689", "Serviços", 1474700, 0.0214, 0.0034, "Sim", 0.0036, 0.0239, "Renegociação de MDR aceita", "MDR fechado 0,08 p.p. acima do recomendado."},
+				            {"PRP-24696", "Saúde", 273900, 0.0215, 0.0062, "Sim", 0.0047, 0.0198, "Contraproposta aceita pelo cliente", "Ajuste aprovado pelo comitê de pricing."},
+				            {"PRP-24703", "Alimentação", 49000, 0.0182, 0.0109, "Sim", 0.0115, 0.0192, "Renegociação de MDR aceita", "MDR fechado 0,08 p.p. acima do recomendado."},
+				            {"PRP-24710", "E-commerce", 49700, 0.011, 0.0092, "Não", null, null, "Sem retorno do cliente", "Volume informado divergente do extrato apresentado."},
+				            {"PRP-24717", "E-commerce", 712100, 0.0129, 0.0052, "Sim", 0.0046, 0.0125, "Renegociação de MDR aceita", "Fechamento condicionado a exclusividade de 12 meses."},
+				            {"PRP-24724", "E-commerce", 2115400, 0.0111, 0.0097, "Sim", 0.011, 0.0119, "Ajuste de antecipação aprovado", "MDR fechado 0,08 p.p. acima do recomendado."},
+				            {"PRP-24731", "Varejo", 1153600, 0.0112, 0.0057, "Não", null, null, "Cliente desistiu da migração", "Volume informado divergente do extrato apresentado."},
+				            {"PRP-24738", "Educação", 518700, 0.0099, 0.0062, "Sim", 0.0068, 0.0086, "Aprovado no pricing recomendado", "Fechamento condicionado a exclusividade de 12 meses."},
+				            {"PRP-24745", "Educação", 3840400, 0.0157, 0.0108, "Não", null, null, "Volume declarado não comprovado", "Contato comercial sem retorno após 3 tentativas."},
+				            {"PRP-24752", "Alimentação", 3275500, 0.021, 0.0036, "Não", null, null, "Sem retorno do cliente", "Proposta expirada sem resposta do cliente."},
+				            {"PRP-24759", "Varejo", 1189400, 0.0245, 0.0082, "Não", null, null, "Sem retorno do cliente", "Volume informado divergente do extrato apresentado."},
+				            {"PRP-24766", "Educação", 690600, 0.0171, 0.0089, "Não", null, null, "Concorrência com taxa menor", "Contato comercial sem retorno após 3 tentativas."},
+				            {"PRP-24773", "E-commerce", 292200, 0.0175, 0.0041, "Não", null, null, "Sem retorno do cliente", "Comitê de risco vetou o limite de antecipação."},
+				            {"PRP-24780", "Educação", 1904600, 0.0172, 0.0116, "Não", null, null, "Restrição de risco de crédito", "Concorrente ofereceu MDR 0,15 p.p. menor."},
+				            {"PRP-24787", "Combustíveis", 134700, 0.0174, 0.007, "Sim", 0.0056, 0.0173, "Contraproposta aceita pelo cliente", "Cliente aceitou o pacote com antecipação automática."},
+				            {"PRP-24794", "Varejo", 1400800, 0.021, 0.0101, "Sim", 0.0106, 0.0191, "Contraproposta aceita pelo cliente", "Ajuste aprovado pelo comitê de pricing."},
+				            {"PRP-24801", "Varejo", 4484600, 0.0103, 0.0046, "Sim", 0.0055, 0.0108, "Contraproposta aceita pelo cliente", "Migração agendada para o próximo ciclo de faturamento."},
+				            {"PRP-24808", "Alimentação", 92000, 0.0107, 0.0034, "Não", null, null, "Sem retorno do cliente", "Volume informado divergente do extrato apresentado."},
+				            {"PRP-24815", "Educação", 3530300, 0.0217, 0.0088, "Sim", 0.0097, 0.022, "Ajuste de antecipação aprovado", "Cliente aceitou o pacote com antecipação automática."},
+				            {"PRP-24822", "Alimentação", 436400, 0.0192, 0.0091, "Não", null, null, "Volume declarado não comprovado", "Concorrente ofereceu MDR 0,15 p.p. menor."},
+				            {"PRP-24829", "E-commerce", 359300, 0.0149, 0.0081, "Não", null, null, "Concorrência com taxa menor", "Concorrente ofereceu MDR 0,15 p.p. menor."}
+				        },
+				        {"ID_proposta", "segmento", "volume_capturado", "taxa_bruta_porc", "irv_final_pricing_porc", "proposta_convertida", "irv_clm", "mdr_clm", "motivo", "observacao"}
+				    ),
+				    Tipado = Table.TransformColumnTypes(
+				        Origem,
+				        {
+				            {"ID_proposta", type text}, {"segmento", type text}, {"volume_capturado", Int64.Type},
+				            {"taxa_bruta_porc", type number}, {"irv_final_pricing_porc", type number},
+				            {"proposta_convertida", type text}, {"irv_clm", type number}, {"mdr_clm", type number},
+				            {"motivo", type text}, {"observacao", type text}
+				        }
+				    )
+				in
+				    Tipado
+
+	annotation PBI_ResultType = Table

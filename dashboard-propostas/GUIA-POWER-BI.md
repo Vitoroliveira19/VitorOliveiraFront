@@ -71,7 +71,7 @@ Abra `medidas.dax` e crie cada medida (*Modelagem → Nova medida*). O arquivo e
 Duas coisas que valem atenção:
 
 - **`Taxa Bruta %` e `IRV Final Pricing %` são médias ponderadas pelo volume.** Com um único ID selecionado — que é o uso da tela de consulta — elas devolvem exatamente o valor daquela linha. Com vários IDs, entregam a média correta em vez de uma média simples que trata uma proposta de R$ 50 mil igual a uma de R$ 5 milhões.
-- **`Δ IRV (rótulo)` multiplica por 100** porque a diferença entre dois percentuais se lê em **pontos percentuais**, não em porcentagem.
+- **`Desvio IRV (rótulo)` multiplica por 100** porque a diferença entre dois percentuais se lê em **pontos percentuais**, não em porcentagem.
 
 ---
 
@@ -117,7 +117,7 @@ Use o visual **Cartão (novo)** — o que aceita *rótulos de referência*. Nos 
 
 ### 4.3 Os detalhes que fazem a tela funcionar
 
-**Delta no cartão de IRV CLM.** No Cartão (novo) → *Rótulos de referência* → adicione `[Δ IRV (rótulo)]` como **Título** do rótulo. Em *Cor da fonte* → **fx** → *Formatar por: Valor do campo* → escolha `[Cor Δ IRV]`. O texto aparece verde quando o fechado ficou acima do recomendado e vermelho quando ficou abaixo. Repita no cartão de MDR com `[Δ MDR (rótulo)]` e `[Cor Δ MDR]`.
+**Delta no cartão de IRV CLM.** No Cartão (novo) → *Rótulos de referência* → adicione `[Desvio IRV (rótulo)]` como **Título** do rótulo. Em *Cor da fonte* → **fx** → *Formatar por: Valor do campo* → escolha `[Cor Desvio IRV]`. O texto aparece verde quando o fechado ficou acima do recomendado e vermelho quando ficou abaixo. Repita no cartão de MDR com `[Desvio MDR (rótulo)]` e `[Cor Desvio MDR]`.
 
 **Selo Convertida / Não convertida.** No cartão do título, o valor `[Situação da Proposta]` já vem com um `●` na frente. Aplique *Cor da fonte → fx → Valor do campo → `[Cor Situação]`*. Assim o estado é lido pela forma **e** pela cor — quem não distingue verde de vermelho ainda lê a palavra.
 

@@ -119,14 +119,14 @@ IF (
 //  3. COMPARAÇÃO RECOMENDADO × FECHADO
 // ---------------------------------------------------------------------
 
-Δ IRV (CLM - Recomendado) =
+Desvio IRV =
 IF (
     NOT ISBLANK ( [IRV CLM %] ),
     [IRV CLM %] - [IRV Final Pricing %]
 )
 
 
-Δ MDR (CLM - Taxa Bruta) =
+Desvio MDR =
 IF (
     NOT ISBLANK ( [MDR CLM %] ),
     [MDR CLM %] - [Taxa Bruta %]
@@ -135,35 +135,35 @@ IF (
 
 // Rótulos prontos para o subtítulo do cartão. *100 porque a diferença
 // entre dois percentuais é lida em pontos percentuais.
-Δ IRV (rótulo) =
-VAR D = [Δ IRV (CLM - Recomendado)]
+Desvio IRV (rótulo) =
+VAR D = [Desvio IRV]
 RETURN
     IF (
         ISBLANK ( D ),
         "",
-        FORMAT ( D * 100, "+0,00;-0,00;0,00" ) & " p.p. vs. recomendado"
+        FORMAT ( D * 100, "+0.00;-0.00;0.00" ) & " p.p. vs. recomendado"
     )
 
 
-Δ MDR (rótulo) =
-VAR D = [Δ MDR (CLM - Taxa Bruta)]
+Desvio MDR (rótulo) =
+VAR D = [Desvio MDR]
 RETURN
     IF (
         ISBLANK ( D ),
         "",
-        FORMAT ( D * 100, "+0,00;-0,00;0,00" ) & " p.p. vs. taxa bruta"
+        FORMAT ( D * 100, "+0.00;-0.00;0.00" ) & " p.p. vs. taxa bruta"
     )
 
 
 // Verde quando o fechado ficou acima do recomendado, vermelho abaixo.
-Cor Δ IRV =
-VAR D = [Δ IRV (CLM - Recomendado)]
+Cor Desvio IRV =
+VAR D = [Desvio IRV]
 RETURN
     SWITCH ( TRUE (), ISBLANK ( D ), "#8996A8", D >= 0, "#0CA30C", "#D03B3B" )
 
 
-Cor Δ MDR =
-VAR D = [Δ MDR (CLM - Taxa Bruta)]
+Cor Desvio MDR =
+VAR D = [Desvio MDR]
 RETURN
     SWITCH ( TRUE (), ISBLANK ( D ), "#8996A8", D >= 0, "#0CA30C", "#D03B3B" )
 
