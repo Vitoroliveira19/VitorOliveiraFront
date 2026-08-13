@@ -254,7 +254,7 @@ tabela += `\tannotation PBI_ResultType = Table\n`;
 escrever(path.join(MODELO, 'definition', 'tables', 'Propostas.tmdl'), tabela);
 
 escrever(path.join(MODELO, 'definition', 'database.tmdl'),
-`database\n\tcompatibilityLevel: 1550\n`);
+`database\n\tcompatibilityLevel: 1567\n`);
 
 escrever(path.join(MODELO, 'definition', 'model.tmdl'),
 `model Model
@@ -270,7 +270,11 @@ annotation PBI_QueryOrder = ["Propostas"]
 ref table Propostas
 `);
 
-escrever(path.join(MODELO, 'definition.pbism'), { version: '4.0', settings: {} });
+escrever(path.join(MODELO, 'definition.pbism'), {
+  $schema: 'https://developer.microsoft.com/json-schemas/fabric/item/semanticModel/definitionProperties/1.0.0/schema.json',
+  version: '4.2',
+  settings: {},
+});
 
 escrever(path.join(MODELO, '.platform'), {
   $schema: 'https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json',
@@ -510,8 +514,8 @@ tema.name = 'tema-propostas';
 escrever(path.join(RELATORIO, 'StaticResources', 'RegisteredResources', 'tema-propostas.json'), tema);
 
 escrever(path.join(RELATORIO, 'definition.pbir'), {
-  $schema: 'https://developer.microsoft.com/json-schemas/fabric/item/report/definition/1.0.0/schema.json',
-  version: '1.0',
+  $schema: 'https://developer.microsoft.com/json-schemas/fabric/item/report/definitionProperties/2.0.0/schema.json',
+  version: '4.0',
   datasetReference: { byPath: { path: '../Propostas.SemanticModel' } },
 });
 
@@ -522,7 +526,7 @@ escrever(path.join(RELATORIO, '.platform'), {
 });
 
 escrever(path.join(RAIZ, 'Propostas.pbip'), {
-  $schema: 'https://developer.microsoft.com/json-schemas/fabric/item/pbip/definition/1.0.0/schema.json',
+  $schema: 'https://developer.microsoft.com/json-schemas/fabric/pbip/pbipProperties/1.0.0/schema.json',
   version: '1.0',
   artifacts: [{ report: { path: 'Propostas.Report' } }],
   settings: { enableAutoRecovery: true },
