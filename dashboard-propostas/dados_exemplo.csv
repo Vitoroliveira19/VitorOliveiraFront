@@ -1,0 +1,49 @@
+﻿id_proposta;segmento;volume_capturado;taxa_bruta_porc;irv_final_pricing_porc;proposta_convertida;irv_clm;mdr_clm;motivo;observacao
+PRP-24500;Educação;593700;1,42;0,36;Sim;0,38;1,21;Renegociação de MDR aceita;Ajuste aprovado pelo comitê de pricing.
+PRP-24507;Combustíveis;2678400;1,43;0,33;Sim;0,27;1,48;Ajuste de antecipação aprovado;Migração agendada para o próximo ciclo de faturamento.
+PRP-24514;Educação;372000;1,17;0,91;Sim;0,81;1,08;Aprovado no pricing recomendado;MDR fechado 0,08 p.p. acima do recomendado.
+PRP-24521;Varejo;524800;1,39;0,42;Sim;0,35;1,35;Contraproposta aceita pelo cliente;Fechamento condicionado a exclusividade de 12 meses.
+PRP-24528;Varejo;56400;1,02;0,67;Sim;0,77;1,01;Aprovado no pricing recomendado;Fechamento condicionado a exclusividade de 12 meses.
+PRP-24535;Saúde;1392200;1,9;0,7;Sim;0,75;1,66;Contraproposta aceita pelo cliente;Cliente aceitou o pacote com antecipação automática.
+PRP-24542;Saúde;4203000;2,08;0,54;Não;;;Fora do prazo de validade;Concorrente ofereceu MDR 0,15 p.p. menor.
+PRP-24549;Educação;3866000;1,81;0,86;Sim;0,7;1,56;Renegociação de MDR aceita;Fechamento condicionado a exclusividade de 12 meses.
+PRP-24556;Serviços;136800;1,09;0,64;Sim;0,58;1,15;Renegociação de MDR aceita;Fechamento condicionado a exclusividade de 12 meses.
+PRP-24563;Serviços;46100;1,76;0,37;Não;;;Sem retorno do cliente;Concorrente ofereceu MDR 0,15 p.p. menor.
+PRP-24570;E-commerce;92200;1,31;0,65;Não;;;Volume declarado não comprovado;Cliente optou por manter o adquirente atual.
+PRP-24577;Combustíveis;1964300;1,03;0,28;Não;;;Sem retorno do cliente;Volume informado divergente do extrato apresentado.
+PRP-24584;Alimentação;112800;1,05;1,1;Sim;1,26;1,13;Aprovado no pricing recomendado;Fechamento condicionado a exclusividade de 12 meses.
+PRP-24591;Alimentação;994500;2,04;0,72;Não;;;Sem retorno do cliente;Proposta expirada sem resposta do cliente.
+PRP-24598;E-commerce;290400;1,43;0,61;Sim;0,47;1,55;Renegociação de MDR aceita;Fechamento condicionado a exclusividade de 12 meses.
+PRP-24605;E-commerce;231500;2,18;0,69;Não;;;Volume declarado não comprovado;Comitê de risco vetou o limite de antecipação.
+PRP-24612;E-commerce;4103300;0,95;1,18;Sim;1,13;0,87;Contraproposta aceita pelo cliente;Fechamento condicionado a exclusividade de 12 meses.
+PRP-24619;Varejo;2468000;2,18;0,81;Sim;0,69;2,22;Ajuste de antecipação aprovado;Migração agendada para o próximo ciclo de faturamento.
+PRP-24626;Combustíveis;1871600;1,05;1,02;Sim;0,77;1,13;Renegociação de MDR aceita;Migração agendada para o próximo ciclo de faturamento.
+PRP-24633;E-commerce;2722400;1,69;0,59;Sim;0,53;1,54;Renegociação de MDR aceita;MDR fechado 0,08 p.p. acima do recomendado.
+PRP-24640;Alimentação;3513500;1,23;0,85;Sim;0,76;1,11;Ajuste de antecipação aprovado;Cliente aceitou o pacote com antecipação automática.
+PRP-24647;Alimentação;2068300;1,91;0,88;Não;;;Restrição de risco de crédito;Contato comercial sem retorno após 3 tentativas.
+PRP-24654;Varejo;58200;1,18;1,17;Não;;;Cliente desistiu da migração;Contato comercial sem retorno após 3 tentativas.
+PRP-24661;Alimentação;901600;1,25;0,98;Sim;0,9;1,15;Aprovado no pricing recomendado;MDR fechado 0,08 p.p. acima do recomendado.
+PRP-24668;Combustíveis;45000;2,15;1,2;Não;;;Fora do prazo de validade;Cliente optou por manter o adquirente atual.
+PRP-24675;Alimentação;3940500;2,18;1,1;Sim;1,24;1,9;Ajuste de antecipação aprovado;MDR fechado 0,08 p.p. acima do recomendado.
+PRP-24682;Combustíveis;641000;2,02;0,87;Não;;;Cliente desistiu da migração;Proposta expirada sem resposta do cliente.
+PRP-24689;Serviços;1474700;2,14;0,34;Sim;0,36;2,39;Renegociação de MDR aceita;MDR fechado 0,08 p.p. acima do recomendado.
+PRP-24696;Saúde;273900;2,15;0,62;Sim;0,47;1,98;Contraproposta aceita pelo cliente;Ajuste aprovado pelo comitê de pricing.
+PRP-24703;Alimentação;49000;1,82;1,09;Sim;1,15;1,92;Renegociação de MDR aceita;MDR fechado 0,08 p.p. acima do recomendado.
+PRP-24710;E-commerce;49700;1,1;0,92;Não;;;Sem retorno do cliente;Volume informado divergente do extrato apresentado.
+PRP-24717;E-commerce;712100;1,29;0,52;Sim;0,46;1,25;Renegociação de MDR aceita;Fechamento condicionado a exclusividade de 12 meses.
+PRP-24724;E-commerce;2115400;1,11;0,97;Sim;1,1;1,19;Ajuste de antecipação aprovado;MDR fechado 0,08 p.p. acima do recomendado.
+PRP-24731;Varejo;1153600;1,12;0,57;Não;;;Cliente desistiu da migração;Volume informado divergente do extrato apresentado.
+PRP-24738;Educação;518700;0,99;0,62;Sim;0,68;0,86;Aprovado no pricing recomendado;Fechamento condicionado a exclusividade de 12 meses.
+PRP-24745;Educação;3840400;1,57;1,08;Não;;;Volume declarado não comprovado;Contato comercial sem retorno após 3 tentativas.
+PRP-24752;Alimentação;3275500;2,1;0,36;Não;;;Sem retorno do cliente;Proposta expirada sem resposta do cliente.
+PRP-24759;Varejo;1189400;2,45;0,82;Não;;;Sem retorno do cliente;Volume informado divergente do extrato apresentado.
+PRP-24766;Educação;690600;1,71;0,89;Não;;;Concorrência com taxa menor;Contato comercial sem retorno após 3 tentativas.
+PRP-24773;E-commerce;292200;1,75;0,41;Não;;;Sem retorno do cliente;Comitê de risco vetou o limite de antecipação.
+PRP-24780;Educação;1904600;1,72;1,16;Não;;;Restrição de risco de crédito;Concorrente ofereceu MDR 0,15 p.p. menor.
+PRP-24787;Combustíveis;134700;1,74;0,7;Sim;0,56;1,73;Contraproposta aceita pelo cliente;Cliente aceitou o pacote com antecipação automática.
+PRP-24794;Varejo;1400800;2,1;1,01;Sim;1,06;1,91;Contraproposta aceita pelo cliente;Ajuste aprovado pelo comitê de pricing.
+PRP-24801;Varejo;4484600;1,03;0,46;Sim;0,55;1,08;Contraproposta aceita pelo cliente;Migração agendada para o próximo ciclo de faturamento.
+PRP-24808;Alimentação;92000;1,07;0,34;Não;;;Sem retorno do cliente;Volume informado divergente do extrato apresentado.
+PRP-24815;Educação;3530300;2,17;0,88;Sim;0,97;2,2;Ajuste de antecipação aprovado;Cliente aceitou o pacote com antecipação automática.
+PRP-24822;Alimentação;436400;1,92;0,91;Não;;;Volume declarado não comprovado;Concorrente ofereceu MDR 0,15 p.p. menor.
+PRP-24829;E-commerce;359300;1,49;0,81;Não;;;Concorrência com taxa menor;Concorrente ofereceu MDR 0,15 p.p. menor.

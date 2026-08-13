@@ -1,0 +1,246 @@
+// =====================================================================
+//  Dashboard de Consulta de Propostas — medidas DAX
+//  Tabela base: Propostas
+//  Pré-requisito: no Power Query, as colunas de percentual
+//  (taxa_bruta_porc, irv_final_pricing_porc, irv_clm, mdr_clm)
+//  já foram divididas por 100 e formatadas como Percentual (2 casas).
+//  Ou seja: 1,42% está armazenado como 0,0142.
+// =====================================================================
+
+
+// ---------------------------------------------------------------------
+//  1. BLOCO "RECOMENDADO"  (cartões grandes da página de consulta)
+// ---------------------------------------------------------------------
+
+Volume Capturado =
+SUM ( Propostas[volume_capturado] )
+
+
+// Média ponderada pelo volume. Com um único ID selecionado, devolve
+// exatamente o valor da linha — que é o caso de uso da tela de consulta.
+Taxa Bruta % =
+VAR Peso = SUM ( Propostas[volume_capturado] )
+RETURN
+    IF (
+        Peso = 0,
+        AVERAGE ( Propostas[taxa_bruta_porc] ),
+        DIVIDE (
+            SUMX ( Propostas, Propostas[volume_capturado] * Propostas[taxa_bruta_porc] ),
+            Peso
+        )
+    )
+
+
+IRV Final Pricing % =
+VAR Peso = SUM ( Propostas[volume_capturado] )
+RETURN
+    IF (
+        Peso = 0,
+        AVERAGE ( Propostas[irv_final_pricing_porc] ),
+        DIVIDE (
+            SUMX ( Propostas, Propostas[volume_capturado] * Propostas[irv_final_pricing_porc] ),
+            Peso
+        )
+    )
+
+
+// ---------------------------------------------------------------------
+//  2. BLOCO "PROPOSTA CONVERTIDA"
+// ---------------------------------------------------------------------
+
+// IRV e MDR do CLM só existem em propostas fechadas: filtramos a base
+// para que a média ponderada não seja diluída pelas linhas em branco.
+IRV CLM % =
+VAR Base =
+    FILTER (
+        Propostas,
+        Propostas[proposta_convertida] = "Sim" && NOT ISBLANK ( Propostas[irv_clm] )
+    )
+VAR Peso = SUMX ( Base, Propostas[volume_capturado] )
+RETURN
+    IF (
+        Peso = 0,
+        AVERAGEX ( Base, Propostas[irv_clm] ),
+        DIVIDE ( SUMX ( Base, Propostas[volume_capturado] * Propostas[irv_clm] ), Peso )
+    )
+
+
+MDR CLM % =
+VAR Base =
+    FILTER (
+        Propostas,
+        Propostas[proposta_convertida] = "Sim" && NOT ISBLANK ( Propostas[mdr_clm] )
+    )
+VAR Peso = SUMX ( Base, Propostas[volume_capturado] )
+RETURN
+    IF (
+        Peso = 0,
+        AVERAGEX ( Base, Propostas[mdr_clm] ),
+        DIVIDE ( SUMX ( Base, Propostas[volume_capturado] * Propostas[mdr_clm] ), Peso )
+    )
+
+
+// Texto do selo de situação. Use num Cartão, com formatação
+// condicional de cor ligada a [Cor Situação].
+Situação da Proposta =
+VAR S = SELECTEDVALUE ( Propostas[proposta_convertida] )
+RETURN
+    SWITCH (
+        TRUE (),
+        ISBLANK ( S ), "—",
+        S = "Sim",     "● Convertida",
+                       "● Não convertida"
+    )
+
+
+Cor Situação =
+IF ( SELECTEDVALUE ( Propostas[proposta_convertida] ) = "Sim", "#0CA30C", "#D03B3B" )
+
+
+// Textos longos. Só exibem conteúdo quando há exatamente um ID em foco —
+// evita o "vários valores" do cartão quando nada foi pesquisado.
+Motivo =
+IF (
+    HASONEVALUE ( Propostas[ID_proposta] ),
+    SELECTEDVALUE ( Propostas[motivo] ),
+    "Selecione um ID de proposta"
+)
+
+
+Observação =
+IF (
+    HASONEVALUE ( Propostas[ID_proposta] ),
+    SELECTEDVALUE ( Propostas[observacao] ),
+    ""
+)
+
+
+// ---------------------------------------------------------------------
+//  3. COMPARAÇÃO RECOMENDADO × FECHADO
+// ---------------------------------------------------------------------
+
+Δ IRV (CLM - Recomendado) =
+IF (
+    NOT ISBLANK ( [IRV CLM %] ),
+    [IRV CLM %] - [IRV Final Pricing %]
+)
+
+
+Δ MDR (CLM - Taxa Bruta) =
+IF (
+    NOT ISBLANK ( [MDR CLM %] ),
+    [MDR CLM %] - [Taxa Bruta %]
+)
+
+
+// Rótulos prontos para o subtítulo do cartão. *100 porque a diferença
+// entre dois percentuais é lida em pontos percentuais.
+Δ IRV (rótulo) =
+VAR D = [Δ IRV (CLM - Recomendado)]
+RETURN
+    IF (
+        ISBLANK ( D ),
+        "",
+        FORMAT ( D * 100, "+0,00;-0,00;0,00" ) & " p.p. vs. recomendado"
+    )
+
+
+Δ MDR (rótulo) =
+VAR D = [Δ MDR (CLM - Taxa Bruta)]
+RETURN
+    IF (
+        ISBLANK ( D ),
+        "",
+        FORMAT ( D * 100, "+0,00;-0,00;0,00" ) & " p.p. vs. taxa bruta"
+    )
+
+
+// Verde quando o fechado ficou acima do recomendado, vermelho abaixo.
+Cor Δ IRV =
+VAR D = [Δ IRV (CLM - Recomendado)]
+RETURN
+    SWITCH ( TRUE (), ISBLANK ( D ), "#8996A8", D >= 0, "#0CA30C", "#D03B3B" )
+
+
+Cor Δ MDR =
+VAR D = [Δ MDR (CLM - Taxa Bruta)]
+RETURN
+    SWITCH ( TRUE (), ISBLANK ( D ), "#8996A8", D >= 0, "#0CA30C", "#D03B3B" )
+
+
+// ---------------------------------------------------------------------
+//  4. CABEÇALHO E ESTADO VAZIO DA PÁGINA DE CONSULTA
+// ---------------------------------------------------------------------
+
+Título da Consulta =
+VAR Id = SELECTEDVALUE ( Propostas[ID_proposta] )
+RETURN
+    IF ( ISBLANK ( Id ), "Nenhuma proposta selecionada", "Proposta " & Id )
+
+
+// Coloque numa caixa de texto/cartão sobreposta aos visuais.
+// Fica em branco assim que um ID é escolhido.
+Aviso Seleção =
+IF (
+    NOT HASONEVALUE ( Propostas[ID_proposta] ),
+    "Digite um ID no filtro de busca à esquerda para carregar a proposta."
+)
+
+
+// ---------------------------------------------------------------------
+//  5. PÁGINA "VISÃO GERAL"
+// ---------------------------------------------------------------------
+
+Qtd Propostas =
+COUNTROWS ( Propostas )
+
+
+Qtd Convertidas =
+CALCULATE ( COUNTROWS ( Propostas ), Propostas[proposta_convertida] = "Sim" )
+
+
+Qtd Não Convertidas =
+CALCULATE ( COUNTROWS ( Propostas ), Propostas[proposta_convertida] = "Não" )
+
+
+Taxa de Conversão % =
+DIVIDE ( [Qtd Convertidas], [Qtd Propostas] )
+
+
+Volume Convertido =
+CALCULATE ( [Volume Capturado], Propostas[proposta_convertida] = "Sim" )
+
+
+// Quanto do volume proposto virou carteira de fato.
+Conversão em Volume % =
+DIVIDE ( [Volume Convertido], [Volume Capturado] )
+
+
+// Subtítulo do número-herói.
+Resumo Conversão =
+[Qtd Convertidas] & " de " & [Qtd Propostas] & " propostas recomendadas foram fechadas."
+
+
+// Spread médio: o quanto, em p.p., o pricing fechado se afastou do recomendado.
+Spread Médio IRV (p.p.) =
+VAR Base =
+    FILTER ( Propostas, Propostas[proposta_convertida] = "Sim" && NOT ISBLANK ( Propostas[irv_clm] ) )
+RETURN
+    AVERAGEX ( Base, Propostas[irv_clm] - Propostas[irv_final_pricing_porc] ) * 100
+
+
+// ---------------------------------------------------------------------
+//  6. COLUNA CALCULADA (não é medida — criar como Nova Coluna)
+// ---------------------------------------------------------------------
+
+// Faixa de Volume =
+// SWITCH (
+//     TRUE (),
+//     Propostas[volume_capturado] < 250000,  "1. Até R$ 250 mil",
+//     Propostas[volume_capturado] < 1000000, "2. R$ 250 mil – 1 mi",
+//     Propostas[volume_capturado] < 2500000, "3. R$ 1 mi – 2,5 mi",
+//                                            "4. Acima de R$ 2,5 mi"
+// )
+//
+// Depois, em "Classificar por coluna", ordene por ela mesma —
+// o prefixo numérico já garante a ordem correta no eixo.

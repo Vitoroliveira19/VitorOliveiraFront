@@ -1,0 +1,805 @@
+<title>Consulta de Propostas</title>
+<style>
+  :root {
+    color-scheme: light;
+    --plane:        #eef1f6;
+    --surface:      #ffffff;
+    --surface-2:    #f6f8fb;
+    --rail:         #122a4d;
+    --rail-ink:     #dce6f4;
+    --rail-ink-dim: #8ea6c6;
+    --rail-active:  #1e4a86;
+    --ink:          #101a29;
+    --ink-2:        #5a6a80;
+    --ink-3:        #8996a8;
+    --line:         #dde3ec;
+    --line-soft:    #e8edf4;
+    --accent:       #2a78d6;
+    --accent-soft:  #e7f0fc;
+    --accent-deep:  #1c5cab;
+    --seq-1:        #cde2fb;
+    --seq-2:        #9ec5f4;
+    --seq-3:        #6da7ec;
+    --seq-4:        #3987e5;
+    --seq-5:        #256abf;
+    --seq-6:        #184f95;
+    --neutral-mark: #c2cbd8;
+    --good:         #0ca30c;
+    --good-soft:    #e4f6e4;
+    --critical:     #d03b3b;
+    --critical-soft:#fbe9e9;
+    --warning:      #fab219;
+    --shadow:       0 1px 2px rgba(16,26,41,.06), 0 8px 24px -12px rgba(16,26,41,.18);
+    --radius:       10px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --plane:        #0c1116;
+      --surface:      #151c26;
+      --surface-2:    #1b232f;
+      --rail:         #0c1b30;
+      --rail-ink:     #cfdcee;
+      --rail-ink-dim: #7c91ad;
+      --rail-active:  #1a3f74;
+      --ink:          #f2f5f9;
+      --ink-2:        #9daabd;
+      --ink-3:        #7a8798;
+      --line:         #27303d;
+      --line-soft:    #1f2833;
+      --accent:       #3987e5;
+      --accent-soft:  #17263c;
+      --accent-deep:  #6da7ec;
+      --seq-1:        #184f95;
+      --seq-2:        #1c5cab;
+      --seq-3:        #256abf;
+      --seq-4:        #3987e5;
+      --seq-5:        #6da7ec;
+      --seq-6:        #9ec5f4;
+      --neutral-mark: #3c4756;
+      --good:         #0ca30c;
+      --good-soft:    #122b16;
+      --critical:     #d03b3b;
+      --critical-soft:#331618;
+      --warning:      #fab219;
+      --shadow:       0 1px 2px rgba(0,0,0,.4), 0 8px 24px -12px rgba(0,0,0,.6);
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --plane:        #0c1116;
+    --surface:      #151c26;
+    --surface-2:    #1b232f;
+    --rail:         #0c1b30;
+    --rail-ink:     #cfdcee;
+    --rail-ink-dim: #7c91ad;
+    --rail-active:  #1a3f74;
+    --ink:          #f2f5f9;
+    --ink-2:        #9daabd;
+    --ink-3:        #7a8798;
+    --line:         #27303d;
+    --line-soft:    #1f2833;
+    --accent:       #3987e5;
+    --accent-soft:  #17263c;
+    --accent-deep:  #6da7ec;
+    --seq-1:        #184f95;
+    --seq-2:        #1c5cab;
+    --seq-3:        #256abf;
+    --seq-4:        #3987e5;
+    --seq-5:        #6da7ec;
+    --seq-6:        #9ec5f4;
+    --neutral-mark: #3c4756;
+    --good:         #0ca30c;
+    --good-soft:    #122b16;
+    --critical:     #d03b3b;
+    --critical-soft:#331618;
+    --warning:      #fab219;
+    --shadow:       0 1px 2px rgba(0,0,0,.4), 0 8px 24px -12px rgba(0,0,0,.6);
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--plane);
+    color: var(--ink);
+    font-family: ui-sans-serif, system-ui, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    font-size: 14px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+
+  .shell { display: grid; grid-template-columns: 232px minmax(0, 1fr); min-height: 100vh; }
+
+  /* ---------- rail ---------- */
+  .rail {
+    background: var(--rail);
+    color: var(--rail-ink);
+    padding: 22px 14px;
+    display: flex; flex-direction: column; gap: 26px;
+    position: sticky; top: 0; height: 100vh;
+  }
+  .brand { display: flex; flex-direction: column; gap: 2px; padding: 0 8px; }
+  .brand b { font-size: 17px; font-weight: 700; letter-spacing: -.02em; color: #fff; }
+  .brand span { font-size: 11px; letter-spacing: .09em; text-transform: uppercase; color: var(--rail-ink-dim); }
+  .rail nav { display: flex; flex-direction: column; gap: 3px; }
+  .rail .navlabel { font-size: 10px; letter-spacing: .11em; text-transform: uppercase; color: var(--rail-ink-dim); padding: 0 10px 6px; }
+  .rail button {
+    all: unset; cursor: pointer;
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 12px; border-radius: 8px;
+    font-size: 13.5px; font-weight: 500; color: var(--rail-ink);
+    transition: background .15s ease;
+  }
+  .rail button:hover { background: rgba(255,255,255,.07); }
+  .rail button[aria-current="true"] { background: var(--rail-active); color: #fff; font-weight: 600; }
+  .rail button svg { flex: none; opacity: .9; }
+  .rail .foot { margin-top: auto; padding: 0 10px; font-size: 11px; line-height: 1.6; color: var(--rail-ink-dim); }
+
+  /* ---------- content ---------- */
+  main { padding: 26px 30px 56px; max-width: 1280px; }
+  .pagehead { display: flex; align-items: baseline; justify-content: space-between; gap: 20px; flex-wrap: wrap; margin-bottom: 20px; }
+  .pagehead h1 { margin: 0; font-size: 22px; font-weight: 700; letter-spacing: -.02em; }
+  .pagehead p { margin: 3px 0 0; font-size: 13px; color: var(--ink-2); }
+
+  .eyebrow { font-size: 10.5px; font-weight: 700; letter-spacing: .11em; text-transform: uppercase; color: var(--ink-3); }
+
+  .card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); }
+
+  /* ---------- search ---------- */
+  .searchbar { padding: 18px 20px; display: flex; gap: 14px; align-items: flex-end; flex-wrap: wrap; margin-bottom: 22px; }
+  .field { display: flex; flex-direction: column; gap: 6px; position: relative; }
+  .field label { font-size: 11px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-2); }
+  .field input, .field select {
+    font: inherit; color: var(--ink); background: var(--surface-2);
+    border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; min-width: 240px;
+  }
+  .field input::placeholder { color: var(--ink-3); }
+  #idsearch { font-variant-numeric: tabular-nums; letter-spacing: .01em; font-weight: 600; }
+  .suggest {
+    position: absolute; top: calc(100% + 4px); left: 0; right: 0; z-index: 30;
+    background: var(--surface); border: 1px solid var(--line); border-radius: 8px;
+    box-shadow: var(--shadow); max-height: 244px; overflow-y: auto; padding: 4px;
+  }
+  .suggest[hidden] { display: none; }
+  .suggest button {
+    all: unset; cursor: pointer; display: flex; justify-content: space-between; gap: 12px;
+    width: 100%; padding: 8px 10px; border-radius: 6px; font-size: 13px; box-sizing: border-box;
+  }
+  .suggest button:hover, .suggest button.on { background: var(--accent-soft); }
+  .suggest b { font-variant-numeric: tabular-nums; font-weight: 600; }
+  .suggest span { color: var(--ink-2); font-size: 12px; }
+  .btn {
+    all: unset; cursor: pointer; background: var(--accent); color: #fff;
+    padding: 10px 20px; border-radius: 8px; font-size: 13.5px; font-weight: 600;
+  }
+  .btn:hover { background: var(--accent-deep); }
+  .btn.ghost { background: transparent; color: var(--ink-2); border: 1px solid var(--line); }
+  .btn.ghost:hover { background: var(--surface-2); color: var(--ink); }
+  .hint { font-size: 12px; color: var(--ink-3); margin-left: auto; align-self: center; }
+
+  /* ---------- section blocks ---------- */
+  .block { margin-bottom: 22px; }
+  .blockhead { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+  .blockhead h2 { margin: 0; font-size: 13px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; }
+  .blockhead .rule { flex: 1; height: 1px; background: var(--line); }
+
+  .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 14px; }
+  .tile { padding: 18px 20px 20px; display: flex; flex-direction: column; gap: 6px; }
+  .tile .k { font-size: 11px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--ink-2); }
+  .tile .v { font-size: 38px; font-weight: 700; letter-spacing: -.035em; line-height: 1.05; font-variant-numeric: tabular-nums; }
+  .tile .v small { font-size: 19px; font-weight: 600; letter-spacing: -.01em; color: var(--ink-2); margin-left: 1px; }
+  .tile .s { font-size: 12px; color: var(--ink-3); }
+  .tile.lead { border-top: 3px solid var(--accent); }
+
+  /* ---------- converted panel ---------- */
+  .conv { padding: 0; overflow: hidden; }
+  .convtop { display: flex; align-items: center; gap: 14px; padding: 16px 20px; border-bottom: 1px solid var(--line); flex-wrap: wrap; }
+  .convtop h3 { margin: 0; font-size: 15px; font-weight: 650; letter-spacing: -.01em; }
+  .pill {
+    display: inline-flex; align-items: center; gap: 7px;
+    padding: 5px 12px 5px 9px; border-radius: 999px;
+    font-size: 12.5px; font-weight: 650; letter-spacing: .01em;
+  }
+  .pill svg { flex: none; }
+  .pill.yes { background: var(--good-soft); color: var(--good); }
+  .pill.no  { background: var(--critical-soft); color: var(--critical); }
+  .convgrid { display: grid; grid-template-columns: minmax(150px, 1fr) minmax(150px, 1fr) minmax(240px, 1.8fr); }
+  .convgrid > div { padding: 16px 20px; border-right: 1px solid var(--line-soft); border-bottom: 1px solid var(--line-soft); }
+  .convgrid .k { font-size: 11px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--ink-2); margin-bottom: 5px; }
+  .convgrid .v { font-size: 26px; font-weight: 700; letter-spacing: -.025em; font-variant-numeric: tabular-nums; }
+  .convgrid .v.text { font-size: 14px; font-weight: 500; letter-spacing: 0; line-height: 1.45; }
+  .convgrid .wide { grid-column: 1 / -1; border-right: none; border-bottom: none; }
+  @media (max-width: 720px) { .convgrid { grid-template-columns: 1fr; } }
+  .delta { font-size: 12px; font-weight: 650; margin-top: 4px; display: inline-flex; align-items: center; gap: 4px; }
+  .delta.up { color: var(--good); }
+  .delta.down { color: var(--critical); }
+  .delta.flat { color: var(--ink-3); }
+
+  .empty { padding: 54px 24px; text-align: center; color: var(--ink-2); }
+  .empty strong { display: block; font-size: 16px; color: var(--ink); margin-bottom: 6px; font-weight: 650; }
+  .empty p { margin: 0; font-size: 13.5px; }
+
+  /* ---------- charts ---------- */
+  .grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(380px, 1fr)); gap: 14px; }
+  .chartcard { padding: 18px 20px 14px; }
+  .chartcard h3 { margin: 0 0 2px; font-size: 14px; font-weight: 650; letter-spacing: -.01em; }
+  .chartcard .sub { margin: 0 0 14px; font-size: 12px; color: var(--ink-2); }
+  .chartcard svg { display: block; width: 100%; height: auto; overflow: visible; }
+  .legend { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 12px; font-size: 12px; color: var(--ink-2); }
+  .legend i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 6px; vertical-align: -1px; }
+  .legend i.ring { background: var(--surface); border: 2px solid var(--neutral-mark); }
+
+  .herorow { display: grid; grid-template-columns: minmax(250px, 1.25fr) repeat(3, minmax(150px, 1fr)); gap: 14px; margin-bottom: 14px; }
+  @media (max-width: 1080px) { .herorow { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); } }
+  .hero { padding: 18px 22px 20px; display: flex; flex-direction: column; justify-content: center; gap: 8px; border-top: 3px solid var(--accent); }
+  .hero .fig { font-size: 54px; font-weight: 700; letter-spacing: -.04em; line-height: 1; font-variant-numeric: tabular-nums; }
+  .hero .fig small { font-size: 26px; font-weight: 600; color: var(--ink-2); }
+  .hero .txt .k { font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-3); }
+  .hero .txt p { margin: 4px 0 0; font-size: 13px; color: var(--ink-2); }
+
+  /* ---------- table ---------- */
+  .tablewrap { overflow: auto; max-height: 440px; }
+  table { border-collapse: collapse; width: 100%; min-width: 860px; font-size: 13px; }
+  thead th {
+    text-align: left; padding: 10px 14px; font-size: 10.5px; font-weight: 700;
+    letter-spacing: .09em; text-transform: uppercase; color: var(--ink-2);
+    background: var(--surface-2); border-bottom: 1px solid var(--line); white-space: nowrap;
+    position: sticky; top: 0; z-index: 2;
+  }
+  tbody td { padding: 10px 14px; border-bottom: 1px solid var(--line-soft); vertical-align: middle; }
+  tbody tr:hover { background: var(--surface-2); }
+  td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+  td.id { font-weight: 650; font-variant-numeric: tabular-nums; }
+  td.id button { all: unset; cursor: pointer; color: var(--accent); font-weight: 650; }
+  td.id button:hover { text-decoration: underline; }
+  .tag { display: inline-flex; align-items: center; gap: 5px; font-size: 11.5px; font-weight: 650; padding: 3px 9px; border-radius: 999px; }
+  .tag.yes { background: var(--good-soft); color: var(--good); }
+  .tag.no { background: var(--critical-soft); color: var(--critical); }
+  .dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; flex: none; }
+
+  /* ---------- tooltip ---------- */
+  #tip {
+    position: fixed; z-index: 90; pointer-events: none; opacity: 0;
+    background: var(--surface); color: var(--ink);
+    border: 1px solid var(--line); border-radius: 8px; box-shadow: var(--shadow);
+    padding: 8px 11px; font-size: 12px; line-height: 1.5; max-width: 260px;
+    transition: opacity .12s ease;
+  }
+  #tip b { font-variant-numeric: tabular-nums; }
+  #tip .tk { color: var(--ink-2); }
+
+  [hidden] { display: none !important; }
+
+  @media (max-width: 820px) {
+    .shell { grid-template-columns: 1fr; }
+    .rail { position: static; height: auto; flex-direction: row; align-items: center; gap: 16px; padding: 12px 16px; }
+    .rail .brand, .rail .foot, .rail .navlabel { display: none; }
+    .rail nav { flex-direction: row; }
+    main { padding: 18px 16px 40px; }
+  }
+</style>
+
+<div class="shell">
+  <aside class="rail">
+    <div class="brand">
+      <b>Pricing</b>
+      <span>Propostas</span>
+    </div>
+    <nav>
+      <div class="navlabel">Páginas</div>
+      <button type="button" data-page="consulta" aria-current="true">
+        <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="7" cy="7" r="4.5"/><path d="M10.5 10.5L14 14" stroke-linecap="round"/></svg>
+        Consulta
+      </button>
+      <button type="button" data-page="visao">
+        <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M2 13V9M6.7 13V3M11.3 13V6.5"/><path d="M1 14.2h14"/></svg>
+        Visão geral
+      </button>
+    </nav>
+    <div class="foot">
+      Protótipo de referência para montagem no Power&nbsp;BI.<br>Dados de exemplo.
+    </div>
+  </aside>
+
+  <main>
+    <!-- ============ PÁGINA 1 ============ -->
+    <section id="page-consulta">
+      <div class="pagehead">
+        <div>
+          <h1>Consulta de proposta</h1>
+          <p>Busque pelo ID da proposta para ver o pricing recomendado e o que foi efetivamente fechado.</p>
+        </div>
+      </div>
+
+      <div class="card searchbar">
+        <div class="field">
+          <label for="idsearch">ID da proposta</label>
+          <input id="idsearch" type="text" placeholder="Digite ou cole o ID…" autocomplete="off"
+                 role="combobox" aria-expanded="false" aria-controls="suggest" aria-autocomplete="list">
+          <div class="suggest" id="suggest" role="listbox" hidden></div>
+        </div>
+        <div class="field">
+          <label for="segfilter">Segmento</label>
+          <select id="segfilter"><option value="">Todos os segmentos</option></select>
+        </div>
+        <div class="field">
+          <label for="convfilter">Situação</label>
+          <select id="convfilter">
+            <option value="">Todas</option>
+            <option value="Sim">Somente convertidas</option>
+            <option value="Não">Somente não convertidas</option>
+          </select>
+        </div>
+        <button class="btn ghost" type="button" id="clearbtn">Limpar</button>
+        <span class="hint" id="counthint"></span>
+      </div>
+
+      <div id="detail" hidden>
+        <div class="block">
+          <div class="blockhead"><h2>Recomendado</h2><div class="rule"></div><span class="eyebrow" id="detail-seg"></span></div>
+          <div class="tiles">
+            <div class="card tile lead">
+              <span class="k">Volume capturado</span>
+              <span class="v" id="t-volume">—</span>
+              <span class="s">Volume mensal estimado na proposta</span>
+            </div>
+            <div class="card tile">
+              <span class="k">Taxa bruta</span>
+              <span class="v" id="t-taxa">—</span>
+              <span class="s">taxa_bruta_porc</span>
+            </div>
+            <div class="card tile">
+              <span class="k">IRV final pricing</span>
+              <span class="v" id="t-irv">—</span>
+              <span class="s">irv_final_pricing_porc</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="block">
+          <div class="blockhead"><h2>Proposta convertida</h2><div class="rule"></div></div>
+          <div class="card conv">
+            <div class="convtop">
+              <h3 id="c-id">—</h3>
+              <span class="pill" id="c-pill"></span>
+            </div>
+            <div class="convgrid">
+              <div>
+                <div class="k">IRV CLM</div>
+                <div class="v" id="c-irv">—</div>
+                <div class="delta" id="c-irv-d"></div>
+              </div>
+              <div>
+                <div class="k">MDR CLM</div>
+                <div class="v" id="c-mdr">—</div>
+                <div class="delta" id="c-mdr-d"></div>
+              </div>
+              <div>
+                <div class="k">Motivo</div>
+                <div class="v text" id="c-motivo">—</div>
+              </div>
+              <div class="wide">
+                <div class="k">Observação</div>
+                <div class="v text" id="c-obs">—</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card empty" id="emptystate">
+        <strong>Nenhuma proposta selecionada</strong>
+        <p>Digite um ID no campo acima — a lista sugere os IDs disponíveis conforme você escreve.</p>
+      </div>
+    </section>
+
+    <!-- ============ PÁGINA 2 ============ -->
+    <section id="page-visao" hidden>
+      <div class="pagehead">
+        <div>
+          <h1>Visão geral da carteira</h1>
+          <p>Como as propostas recomendadas estão convertendo e onde o pricing fechado se afasta do recomendado.</p>
+        </div>
+      </div>
+
+      <div class="herorow">
+        <div class="card hero">
+          <div class="fig" id="h-conv">—</div>
+          <div class="txt">
+            <div class="k">Taxa de conversão</div>
+            <p id="h-sub">—</p>
+          </div>
+        </div>
+        <div class="card tile"><span class="k">Volume proposto</span><span class="v" id="h-vol" style="font-size:27px">—</span><span class="s">Soma de todas as propostas</span></div>
+        <div class="card tile"><span class="k">Volume convertido</span><span class="v" id="h-volc" style="font-size:27px">—</span><span class="s">Somente propostas fechadas</span></div>
+        <div class="card tile"><span class="k">IRV médio ponderado</span><span class="v" id="h-irv" style="font-size:27px">—</span><span class="s">Recomendado, pelo volume</span></div>
+      </div>
+
+      <div class="grid2" style="margin-bottom:14px">
+        <div class="card chartcard">
+          <h3>Por que as propostas não fecham</h3>
+          <p class="sub">Propostas não convertidas, por motivo registrado</p>
+          <svg id="ch-motivos" role="img" aria-label="Barras horizontais com a contagem de propostas não convertidas por motivo"></svg>
+        </div>
+        <div class="card chartcard">
+          <h3>Conversão por faixa de volume</h3>
+          <p class="sub">Participação de propostas convertidas em cada faixa de volume capturado</p>
+          <svg id="ch-faixas" role="img" aria-label="Barras empilhadas de propostas convertidas e não convertidas por faixa de volume"></svg>
+          <div class="legend">
+            <span><i style="background:var(--accent)"></i>Convertida</span>
+            <span><i style="background:var(--neutral-mark)"></i>Não convertida</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card chartcard" style="margin-bottom:14px">
+        <h3>IRV recomendado × IRV fechado</h3>
+        <p class="sub">Propostas convertidas com maior volume capturado — cada linha liga o valor recomendado ao valor CLM</p>
+        <svg id="ch-dumbbell" role="img" aria-label="Gráfico de halteres comparando IRV recomendado e IRV CLM por proposta"></svg>
+        <div class="legend">
+          <span><i class="ring"></i>IRV final pricing (recomendado)</span>
+          <span><i style="background:var(--accent)"></i>IRV CLM (fechado)</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="chartcard" style="padding-bottom:6px">
+          <h3>Todas as propostas</h3>
+          <p class="sub">Clique em um ID para abrir a consulta detalhada</p>
+        </div>
+        <div class="tablewrap"><table id="tbl">
+          <thead><tr>
+            <th>ID proposta</th><th>Segmento</th><th class="num">Volume capturado</th>
+            <th class="num">Taxa bruta</th><th class="num">IRV pricing</th>
+            <th>Convertida</th><th class="num">IRV CLM</th><th class="num">MDR CLM</th><th>Motivo</th>
+          </tr></thead>
+          <tbody></tbody>
+        </table></div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<div id="tip" role="tooltip"></div>
+
+<script>
+const DADOS = [{"id_proposta":"PRP-24500","segmento":"Educação","volume_capturado":593700,"taxa_bruta_porc":1.42,"irv_final_pricing_porc":0.36,"proposta_convertida":"Sim","irv_clm":0.38,"mdr_clm":1.21,"motivo":"Renegociação de MDR aceita","observacao":"Ajuste aprovado pelo comitê de pricing."},{"id_proposta":"PRP-24507","segmento":"Combustíveis","volume_capturado":2678400,"taxa_bruta_porc":1.43,"irv_final_pricing_porc":0.33,"proposta_convertida":"Sim","irv_clm":0.27,"mdr_clm":1.48,"motivo":"Ajuste de antecipação aprovado","observacao":"Migração agendada para o próximo ciclo de faturamento."},{"id_proposta":"PRP-24514","segmento":"Educação","volume_capturado":372000,"taxa_bruta_porc":1.17,"irv_final_pricing_porc":0.91,"proposta_convertida":"Sim","irv_clm":0.81,"mdr_clm":1.08,"motivo":"Aprovado no pricing recomendado","observacao":"MDR fechado 0,08 p.p. acima do recomendado."},{"id_proposta":"PRP-24521","segmento":"Varejo","volume_capturado":524800,"taxa_bruta_porc":1.39,"irv_final_pricing_porc":0.42,"proposta_convertida":"Sim","irv_clm":0.35,"mdr_clm":1.35,"motivo":"Contraproposta aceita pelo cliente","observacao":"Fechamento condicionado a exclusividade de 12 meses."},{"id_proposta":"PRP-24528","segmento":"Varejo","volume_capturado":56400,"taxa_bruta_porc":1.02,"irv_final_pricing_porc":0.67,"proposta_convertida":"Sim","irv_clm":0.77,"mdr_clm":1.01,"motivo":"Aprovado no pricing recomendado","observacao":"Fechamento condicionado a exclusividade de 12 meses."},{"id_proposta":"PRP-24535","segmento":"Saúde","volume_capturado":1392200,"taxa_bruta_porc":1.9,"irv_final_pricing_porc":0.7,"proposta_convertida":"Sim","irv_clm":0.75,"mdr_clm":1.66,"motivo":"Contraproposta aceita pelo cliente","observacao":"Cliente aceitou o pacote com antecipação automática."},{"id_proposta":"PRP-24542","segmento":"Saúde","volume_capturado":4203000,"taxa_bruta_porc":2.08,"irv_final_pricing_porc":0.54,"proposta_convertida":"Não","irv_clm":null,"mdr_clm":null,"motivo":"Fora do prazo de validade","observacao":"Concorrente ofereceu MDR 0,15 p.p. menor."},{"id_proposta":"PRP-24549","segmento":"Educação","volume_capturado":3866000,"taxa_bruta_porc":1.81,"irv_final_pricing_porc":0.86,"proposta_convertida":"Sim","irv_clm":0.7,"mdr_clm":1.56,"motivo":"Renegociação de MDR aceita","observacao":"Fechamento condicionado a exclusividade de 12 meses."},{"id_proposta":"PRP-24556","segmento":"Serviços","volume_capturado":136800,"taxa_bruta_porc":1.09,"irv_final_pricing_porc":0.64,"proposta_convertida":"Sim","irv_clm":0.58,"mdr_clm":1.15,"motivo":"Renegociação de MDR aceita","observacao":"Fechamento condicionado a exclusividade de 12 meses."},{"id_proposta":"PRP-24563","segmento":"Serviços","volume_capturado":46100,"taxa_bruta_porc":1.76,"irv_final_pricing_porc":0.37,"proposta_convertida":"Não","irv_clm":null,"mdr_clm":null,"motivo":"Sem retorno do cliente","observacao":"Concorrente ofereceu MDR 0,15 p.p. menor."},{"id_proposta":"PRP-24570","segmento":"E-commerce","volume_capturado":92200,"taxa_bruta_porc":1.31,"irv_final_pricing_porc":0.65,"proposta_convertida":"Não","irv_clm":null,"mdr_clm":null,"motivo":"Volume declarado não comprovado","observacao":"Cliente optou por manter o adquirente atual."},{"id_proposta":"PRP-24577","segmento":"Combustíveis","volume_capturado":1964300,"taxa_bruta_porc":1.03,"irv_final_pricing_porc":0.28,"proposta_convertida":"Não","irv_clm":null,"mdr_clm":null,"motivo":"Sem retorno do cliente","observacao":"Volume informado divergente do extrato apresentado."},{"id_proposta":"PRP-24584","segmento":"Alimentação","volume_capturado":112800,"taxa_bruta_porc":1.05,"irv_final_pricing_porc":1.1,"proposta_convertida":"Sim","irv_clm":1.26,"mdr_clm":1.13,"motivo":"Aprovado no pricing recomendado","observacao":"Fechamento condicionado a exclusividade de 12 meses."},{"id_proposta":"PRP-24591","segmento":"Alimentação","volume_capturado":994500,"taxa_bruta_porc":2.04,"irv_final_pricing_porc":0.72,"proposta_convertida":"Não","irv_clm":null,"mdr_clm":null,"motivo":"Sem retorno do cliente","observacao":"Proposta expirada sem resposta do cliente."},{"id_proposta":"PRP-24598","segmento":"E-commerce","volume_capturado":290400,"taxa_bruta_porc":1.43,"irv_final_pricing_porc":0.61,"proposta_convertida":"Sim","irv_clm":0.47,"mdr_clm":1.55,"motivo":"Renegociação de MDR aceita","observacao":"Fechamento condicionado a exclusividade de 12 meses."},{"id_proposta":"PRP-24605","segmento":"E-commerce","volume_capturado":231500,"taxa_bruta_porc":2.18,"irv_final_pricing_porc":0.69,"proposta_convertida":"Não","irv_clm":null,"mdr_clm":null,"motivo":"Volume declarado não comprovado","observacao":"Comitê de risco vetou o limite de antecipação."},{"id_proposta":"PRP-24612","segmento":"E-commerce","volume_capturado":4103300,"taxa_bruta_porc":0.95,"irv_final_pricing_porc":1.18,"proposta_convertida":"Sim","irv_clm":1.13,"mdr_clm":0.87,"motivo":"Contraproposta aceita pelo cliente","observacao":"Fechamento condicionado a exclusividade de 12 meses."},{"id_proposta":"PRP-24619","segmento":"Varejo","volume_capturado":2468000,"taxa_bruta_porc":2.18,"irv_final_pricing_porc":0.81,"proposta_convertida":"Sim","irv_clm":0.69,"mdr_clm":2.22,"motivo":"Ajuste de antecipação aprovado","observacao":"Migração agendada para o próximo ciclo de faturamento."},{"id_proposta":"PRP-24626","segmento":"Combustíveis","volume_capturado":1871600,"taxa_bruta_porc":1.05,"irv_final_pricing_porc":1.02,"proposta_convertida":"Sim","irv_clm":0.77,"mdr_clm":1.13,"motivo":"Renegociação de MDR aceita","observacao":"Migração agendada para o próximo ciclo de faturamento."},{"id_proposta":"PRP-24633","segmento":"E-commerce","volume_capturado":2722400,"taxa_bruta_porc":1.69,"irv_final_pricing_porc":0.59,"proposta_convertida":"Sim","irv_clm":0.53,"mdr_clm":1.54,"motivo":"Renegociação de MDR aceita","observacao":"MDR fechado 0,08 p.p. acima do recomendado."},{"id_proposta":"PRP-24640","segmento":"Alimentação","volume_capturado":3513500,"taxa_bruta_porc":1.23,"irv_final_pricing_porc":0.85,"proposta_convertida":"Sim","irv_clm":0.76,"mdr_clm":1.11,"motivo":"Ajuste de antecipação aprovado","observacao":"Cliente aceitou o pacote com antecipação automática."},{"id_proposta":"PRP-24647","segmento":"Alimentação","volume_capturado":2068300,"taxa_bruta_porc":1.91,"irv_final_pricing_porc":0.88,"proposta_convertida":"Não","irv_clm":null,"mdr_clm":null,"motivo":"Restrição de risco de crédito","observacao":"Contato comercial sem retorno após 3 tentativas."},{"id_proposta":"PRP-24654","segmento":"Varejo","volume_capturado":58200,"taxa_bruta_porc":1.18,"irv_final_pricing_porc":1.17,"proposta_convertida":"Não","irv_clm":null,"mdr_clm":null,"motivo":"Cliente desistiu da migração","observacao":"Contato comercial sem retorno após 3 tentativas."},{"id_proposta":"PRP-24661","segmento":"Alimentação","volume_capturado":901600,"taxa_bruta_porc":1.25,"irv_final_pricing_porc":0.98,"proposta_convertida":"Sim","irv_clm":0.9,"mdr_clm":1.15,"motivo":"Aprovado no pricing recomendado","observacao":"MDR fechado 0,08 p.p. acima do recomendado."},{"id_proposta":"PRP-24668","segmento":"Combustíveis","volume_capturado":45000,"taxa_bruta_porc":2.15,"irv_final_pricing_porc":1.2,"proposta_convertida":"Não","irv_clm":null,"mdr_clm":null,"motivo":"Fora do prazo de validade","observacao":"Cliente optou por manter o adquirente atual."},{"id_proposta":"PRP-24675","segmento":"Alimentação","volume_capturado":3940500,"taxa_bruta_porc":2.18,"irv_final_pricing_porc":1.1,"proposta_convertida":"Sim","irv_clm":1.24,"mdr_clm":1.9,"motivo":"Ajuste de antecipação aprovado","observacao":"MDR fechado 0,08 p.p. acima do recomendado."},{"id_proposta":"PRP-24682","segmento":"Combustíveis","volume_capturado":641000,"taxa_bruta_porc":2.02,"irv_final_pricing_porc":0.87,"proposta_convertida":"Não","irv_clm":null,"mdr_clm":null,"motivo":"Cliente desistiu da migração","observacao":"Proposta expirada sem resposta do cliente."},{"id_proposta":"PRP-24689","segmento":"Serviços","volume_capturado":1474700,"taxa_bruta_porc":2.14,"irv_final_pricing_porc":0.34,"proposta_convertida":"Sim","irv_clm":0.36,"mdr_clm":2.39,"motivo":"Renegociação de MDR aceita","observacao":"MDR fechado 0,08 p.p. acima do recomendado."},{"id_proposta":"PRP-24696","segmento":"Saúde","volume_capturado":273900,"taxa_bruta_porc":2.15,"irv_final_pricing_porc":0.62,"proposta_convertida":"Sim","irv_clm":0.47,"mdr_clm":1.98,"motivo":"Contraproposta aceita pelo cliente","observacao":"Ajuste aprovado pelo comitê de pricing."},{"id_proposta":"PRP-24703","segmento":"Alimentação","volume_capturado":49000,"taxa_bruta_porc":1.82,"irv_final_pricing_porc":1.09,"proposta_convertida":"Sim","irv_clm":1.15,"mdr_clm":1.92,"motivo":"Renegociação de MDR aceita","observacao":"MDR fechado 0,08 p.p. acima do recomendado."},{"id_proposta":"PRP-24710","segmento":"E-commerce","volume_capturado":49700,"taxa_bruta_porc":1.1,"irv_final_pricing_porc":0.92,"proposta_convertida":"Não","irv_clm":null,"mdr_clm":null,"motivo":"Sem retorno do cliente","observacao":"Volume informado divergente do extrato apresentado."},{"id_proposta":"PRP-24717","segmento":"E-commerce","volume_capturado":712100,"taxa_bruta_porc":1.29,"irv_final_pricing_porc":0.52,"proposta_convertida":"Sim","irv_clm":0.46,"mdr_clm":1.25,"motivo":"Renegociação de MDR aceita","observacao":"Fechamento condicionado a exclusividade de 12 meses."},{"id_proposta":"PRP-24724","segmento":"E-commerce","volume_capturado":2115400,"taxa_bruta_porc":1.11,"irv_final_pricing_porc":0.97,"proposta_convertida":"Sim","irv_clm":1.1,"mdr_clm":1.19,"motivo":"Ajuste de antecipação aprovado","observacao":"MDR fechado 0,08 p.p. acima do recomendado."},{"id_proposta":"PRP-24731","segmento":"Varejo","volume_capturado":1153600,"taxa_bruta_porc":1.12,"irv_final_pricing_porc":0.57,"proposta_convertida":"Não","irv_clm":null,"mdr_clm":null,"motivo":"Cliente desistiu da migração","observacao":"Volume informado divergente do extrato apresentado."},{"id_proposta":"PRP-24738","segmento":"Educação","volume_capturado":518700,"taxa_bruta_porc":0.99,"irv_final_pricing_porc":0.62,"proposta_convertida":"Sim","irv_clm":0.68,"mdr_clm":0.86,"motivo":"Aprovado no pricing recomendado","observacao":"Fechamento condicionado a exclusividade de 12 meses."},{"id_proposta":"PRP-24745","segmento":"Educação","volume_capturado":3840400,"taxa_bruta_porc":1.57,"irv_final_pricing_porc":1.08,"proposta_convertida":"Não","irv_clm":null,"mdr_clm":null,"motivo":"Volume declarado não comprovado","observacao":"Contato comercial sem retorno após 3 tentativas."},{"id_proposta":"PRP-24752","segmento":"Alimentação","volume_capturado":3275500,"taxa_bruta_porc":2.1,"irv_final_pricing_porc":0.36,"proposta_convertida":"Não","irv_clm":null,"mdr_clm":null,"motivo":"Sem retorno do cliente","observacao":"Proposta expirada sem resposta do cliente."},{"id_proposta":"PRP-24759","segmento":"Varejo","volume_capturado":1189400,"taxa_bruta_porc":2.45,"irv_final_pricing_porc":0.82,"proposta_convertida":"Não","irv_clm":null,"mdr_clm":null,"motivo":"Sem retorno do cliente","observacao":"Volume informado divergente do extrato apresentado."},{"id_proposta":"PRP-24766","segmento":"Educação","volume_capturado":690600,"taxa_bruta_porc":1.71,"irv_final_pricing_porc":0.89,"proposta_convertida":"Não","irv_clm":null,"mdr_clm":null,"motivo":"Concorrência com taxa menor","observacao":"Contato comercial sem retorno após 3 tentativas."},{"id_proposta":"PRP-24773","segmento":"E-commerce","volume_capturado":292200,"taxa_bruta_porc":1.75,"irv_final_pricing_porc":0.41,"proposta_convertida":"Não","irv_clm":null,"mdr_clm":null,"motivo":"Sem retorno do cliente","observacao":"Comitê de risco vetou o limite de antecipação."},{"id_proposta":"PRP-24780","segmento":"Educação","volume_capturado":1904600,"taxa_bruta_porc":1.72,"irv_final_pricing_porc":1.16,"proposta_convertida":"Não","irv_clm":null,"mdr_clm":null,"motivo":"Restrição de risco de crédito","observacao":"Concorrente ofereceu MDR 0,15 p.p. menor."},{"id_proposta":"PRP-24787","segmento":"Combustíveis","volume_capturado":134700,"taxa_bruta_porc":1.74,"irv_final_pricing_porc":0.7,"proposta_convertida":"Sim","irv_clm":0.56,"mdr_clm":1.73,"motivo":"Contraproposta aceita pelo cliente","observacao":"Cliente aceitou o pacote com antecipação automática."},{"id_proposta":"PRP-24794","segmento":"Varejo","volume_capturado":1400800,"taxa_bruta_porc":2.1,"irv_final_pricing_porc":1.01,"proposta_convertida":"Sim","irv_clm":1.06,"mdr_clm":1.91,"motivo":"Contraproposta aceita pelo cliente","observacao":"Ajuste aprovado pelo comitê de pricing."},{"id_proposta":"PRP-24801","segmento":"Varejo","volume_capturado":4484600,"taxa_bruta_porc":1.03,"irv_final_pricing_porc":0.46,"proposta_convertida":"Sim","irv_clm":0.55,"mdr_clm":1.08,"motivo":"Contraproposta aceita pelo cliente","observacao":"Migração agendada para o próximo ciclo de faturamento."},{"id_proposta":"PRP-24808","segmento":"Alimentação","volume_capturado":92000,"taxa_bruta_porc":1.07,"irv_final_pricing_porc":0.34,"proposta_convertida":"Não","irv_clm":null,"mdr_clm":null,"motivo":"Sem retorno do cliente","observacao":"Volume informado divergente do extrato apresentado."},{"id_proposta":"PRP-24815","segmento":"Educação","volume_capturado":3530300,"taxa_bruta_porc":2.17,"irv_final_pricing_porc":0.88,"proposta_convertida":"Sim","irv_clm":0.97,"mdr_clm":2.2,"motivo":"Ajuste de antecipação aprovado","observacao":"Cliente aceitou o pacote com antecipação automática."},{"id_proposta":"PRP-24822","segmento":"Alimentação","volume_capturado":436400,"taxa_bruta_porc":1.92,"irv_final_pricing_porc":0.91,"proposta_convertida":"Não","irv_clm":null,"mdr_clm":null,"motivo":"Volume declarado não comprovado","observacao":"Concorrente ofereceu MDR 0,15 p.p. menor."},{"id_proposta":"PRP-24829","segmento":"E-commerce","volume_capturado":359300,"taxa_bruta_porc":1.49,"irv_final_pricing_porc":0.81,"proposta_convertida":"Não","irv_clm":null,"mdr_clm":null,"motivo":"Concorrência com taxa menor","observacao":"Concorrente ofereceu MDR 0,15 p.p. menor."}];
+
+/* ---------- formatação pt-BR ---------- */
+const brl  = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 });
+const brlK = (v) => v >= 1e6 ? 'R$ ' + (v / 1e6).toLocaleString('pt-BR', { maximumFractionDigits: 1 }) + ' mi'
+                             : 'R$ ' + Math.round(v / 1e3).toLocaleString('pt-BR') + ' mil';
+const pct  = (v, d = 2) => v == null ? '—' : v.toLocaleString('pt-BR', { minimumFractionDigits: d, maximumFractionDigits: d }) + '%';
+const pp   = (v) => (v > 0 ? '+' : '') + v.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' p.p.';
+const esc  = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const $    = (id) => document.getElementById(id);
+
+/* ---------- navegação entre páginas ---------- */
+const pages = { consulta: $('page-consulta'), visao: $('page-visao') };
+document.querySelectorAll('.rail button[data-page]').forEach((b) => {
+  b.addEventListener('click', () => goto(b.dataset.page));
+});
+function goto(name) {
+  Object.entries(pages).forEach(([k, el]) => { el.hidden = k !== name; });
+  document.querySelectorAll('.rail button[data-page]').forEach((b) => {
+    b.setAttribute('aria-current', String(b.dataset.page === name));
+  });
+  window.scrollTo({ top: 0 });
+  if (name === 'visao') desenharGraficos();
+}
+
+/* ---------- filtros ---------- */
+const inputId = $('idsearch'), boxSug = $('suggest');
+const selSeg = $('segfilter'), selConv = $('convfilter');
+let selecionada = null, marcado = -1;
+
+[...new Set(DADOS.map((d) => d.segmento))].sort((a, b) => a.localeCompare(b, 'pt-BR')).forEach((s) => {
+  selSeg.insertAdjacentHTML('beforeend', `<option value="${esc(s)}">${esc(s)}</option>`);
+});
+
+function candidatos() {
+  const q = inputId.value.trim().toLowerCase();
+  return DADOS.filter((d) =>
+    (!q || d.id_proposta.toLowerCase().includes(q)) &&
+    (!selSeg.value || d.segmento === selSeg.value) &&
+    (!selConv.value || d.proposta_convertida === selConv.value));
+}
+
+function renderSugestoes() {
+  const lista = candidatos().slice(0, 40);
+  $('counthint').textContent = `${candidatos().length} de ${DADOS.length} propostas no filtro`;
+  if (!lista.length) {
+    boxSug.innerHTML = `<button type="button" disabled style="cursor:default;color:var(--ink-3)">Nenhum ID corresponde</button>`;
+  } else {
+    boxSug.innerHTML = lista.map((d, i) =>
+      `<button type="button" role="option" data-id="${esc(d.id_proposta)}" class="${i === marcado ? 'on' : ''}">
+         <b>${esc(d.id_proposta)}</b><span>${esc(d.segmento)} · ${brlK(d.volume_capturado)}</span>
+       </button>`).join('');
+  }
+  boxSug.hidden = false;
+  inputId.setAttribute('aria-expanded', 'true');
+}
+function fecharSugestoes() { boxSug.hidden = true; marcado = -1; inputId.setAttribute('aria-expanded', 'false'); }
+
+inputId.addEventListener('focus', () => { marcado = -1; renderSugestoes(); });
+inputId.addEventListener('input', () => { marcado = -1; renderSugestoes(); });
+inputId.addEventListener('keydown', (e) => {
+  const n = candidatos().slice(0, 40).length;
+  if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+    e.preventDefault();
+    if (boxSug.hidden) renderSugestoes();
+    marcado = e.key === 'ArrowDown' ? Math.min(marcado + 1, n - 1) : Math.max(marcado - 1, 0);
+    renderSugestoes();
+    boxSug.querySelector('.on')?.scrollIntoView({ block: 'nearest' });
+  } else if (e.key === 'Enter') {
+    const lista = candidatos();
+    const alvo = marcado >= 0 ? lista[marcado]
+      : lista.find((d) => d.id_proposta.toLowerCase() === inputId.value.trim().toLowerCase()) || lista[0];
+    if (alvo) selecionar(alvo.id_proposta);
+  } else if (e.key === 'Escape') { fecharSugestoes(); }
+});
+boxSug.addEventListener('click', (e) => {
+  const b = e.target.closest('button[data-id]');
+  if (b) selecionar(b.dataset.id);
+});
+document.addEventListener('click', (e) => {
+  if (!e.target.closest('#suggest') && e.target !== inputId) fecharSugestoes();
+});
+[selSeg, selConv].forEach((s) => s.addEventListener('change', () => {
+  $('counthint').textContent = `${candidatos().length} de ${DADOS.length} propostas no filtro`;
+  if (selecionada && !candidatos().some((d) => d.id_proposta === selecionada)) limpar();
+}));
+$('clearbtn').addEventListener('click', () => { inputId.value = ''; selSeg.value = ''; selConv.value = ''; limpar(); });
+
+function limpar() {
+  selecionada = null;
+  $('detail').hidden = true;
+  $('emptystate').hidden = false;
+  $('counthint').textContent = `${candidatos().length} de ${DADOS.length} propostas no filtro`;
+}
+
+/* ---------- detalhe da proposta ---------- */
+function selecionar(id) {
+  const d = DADOS.find((x) => x.id_proposta === id);
+  if (!d) return;
+  selecionada = id;
+  inputId.value = d.id_proposta;
+  fecharSugestoes();
+  goto('consulta');
+
+  $('emptystate').hidden = true;
+  $('detail').hidden = false;
+  $('detail-seg').textContent = d.segmento;
+  $('t-volume').innerHTML = brl.format(d.volume_capturado).replace('R$', '<small>R$</small>');
+  $('t-taxa').innerHTML = pct(d.taxa_bruta_porc) .replace('%', '<small>%</small>');
+  $('t-irv').innerHTML  = pct(d.irv_final_pricing_porc).replace('%', '<small>%</small>');
+
+  const conv = d.proposta_convertida === 'Sim';
+  $('c-id').textContent = d.id_proposta;
+  $('c-pill').className = 'pill ' + (conv ? 'yes' : 'no');
+  $('c-pill').innerHTML = conv
+    ? `<svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8.5l3.2 3.2L13 5"/></svg>Convertida`
+    : `<svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 4l8 8M12 4l-8 8"/></svg>Não convertida`;
+
+  $('c-irv').textContent = conv ? pct(d.irv_clm) : '—';
+  $('c-mdr').textContent = conv ? pct(d.mdr_clm) : '—';
+  $('c-motivo').textContent = d.motivo;
+  $('c-obs').textContent = d.observacao;
+  delta($('c-irv-d'), conv ? d.irv_clm - d.irv_final_pricing_porc : null, 'vs. recomendado');
+  delta($('c-mdr-d'), conv ? d.mdr_clm - d.taxa_bruta_porc : null, 'vs. taxa bruta');
+}
+
+function delta(el, v, rot) {
+  if (v == null) { el.textContent = ''; el.className = 'delta'; return; }
+  const cls = Math.abs(v) < 0.005 ? 'flat' : v > 0 ? 'up' : 'down';
+  const seta = cls === 'flat' ? '=' : cls === 'up' ? '▲' : '▼';
+  el.className = 'delta ' + cls;
+  el.textContent = `${seta} ${pp(v)} ${rot}`;
+}
+
+/* ---------- tooltip ---------- */
+const tip = $('tip');
+function mostrarTip(e, html) {
+  tip.innerHTML = html; tip.style.opacity = '1';
+  const r = tip.getBoundingClientRect();
+  let x = e.clientX + 14, y = e.clientY - r.height - 10;
+  if (x + r.width > innerWidth - 8) x = e.clientX - r.width - 14;
+  if (y < 8) y = e.clientY + 18;
+  tip.style.left = x + 'px'; tip.style.top = y + 'px';
+}
+const esconderTip = () => { tip.style.opacity = '0'; };
+
+/* ---------- helpers SVG ---------- */
+const NS = 'http://www.w3.org/2000/svg';
+function el(tag, attrs, parent) {
+  const n = document.createElementNS(NS, tag);
+  for (const k in attrs) n.setAttribute(k, attrs[k]);
+  if (parent) parent.appendChild(n);
+  return n;
+}
+// barra horizontal com apenas a ponta (extremidade do dado) arredondada
+function barraH(x, y, w, h, r) {
+  const rr = Math.max(0, Math.min(r, w));
+  return `M${x},${y} H${x + w - rr} a${rr},${rr} 0 0 1 ${rr},${rr} V${y + h - rr} a${rr},${rr} 0 0 1 ${-rr},${rr} H${x} Z`;
+}
+function rotulo(svg, x, y, txt, opts = {}) {
+  const t = el('text', {
+    x, y, fill: opts.fill || 'var(--ink-2)', 'font-size': opts.size || 11.5,
+    'text-anchor': opts.anchor || 'start', 'dominant-baseline': 'middle',
+    'font-weight': opts.weight || 400, 'font-family': 'inherit',
+  }, svg);
+  t.textContent = txt;
+  if (opts.tabular) t.setAttribute('style', 'font-variant-numeric:tabular-nums');
+  return t;
+}
+
+/* ---------- gráficos ---------- */
+let desenhado = false;
+function desenharGraficos() {
+  if (desenhado) return;
+  desenhado = true;
+
+  const total = DADOS.length;
+  const conv = DADOS.filter((d) => d.proposta_convertida === 'Sim');
+  const volTotal = DADOS.reduce((a, d) => a + d.volume_capturado, 0);
+  const volConv = conv.reduce((a, d) => a + d.volume_capturado, 0);
+  const irvPond = DADOS.reduce((a, d) => a + d.volume_capturado * d.irv_final_pricing_porc, 0) / volTotal;
+
+  $('h-conv').innerHTML = (conv.length / total * 100).toLocaleString('pt-BR', { maximumFractionDigits: 1 }) + '<small>%</small>';
+  $('h-sub').textContent = `${conv.length} de ${total} propostas recomendadas foram fechadas.`;
+  $('h-vol').textContent = brlK(volTotal);
+  $('h-volc').textContent = brlK(volConv);
+  $('h-irv').textContent = pct(irvPond);
+
+  chartMotivos();
+  chartFaixas();
+  chartDumbbell();
+  montarTabela();
+}
+
+/* — motivos de não conversão: barras horizontais, rampa sequencial de um tom — */
+function chartMotivos() {
+  const svg = $('ch-motivos');
+  const naoConv = DADOS.filter((d) => d.proposta_convertida === 'Não');
+  const mapa = new Map();
+  naoConv.forEach((d) => mapa.set(d.motivo, (mapa.get(d.motivo) || 0) + 1));
+  const dados = [...mapa].map(([k, v]) => ({ k, v })).sort((a, b) => b.v - a.v);
+
+  const padL = 210, padR = 44, alturaBarra = 26, gap = 10, topo = 4;
+  const W = 640, H = topo + dados.length * (alturaBarra + gap);
+  svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+  svg.innerHTML = '';
+  const max = Math.max(...dados.map((d) => d.v));
+  const escala = (W - padL - padR) / max;
+  const tons = ['var(--seq-6)', 'var(--seq-5)', 'var(--seq-4)', 'var(--seq-3)', 'var(--seq-2)', 'var(--seq-1)'];
+
+  dados.forEach((d, i) => {
+    const y = topo + i * (alturaBarra + gap);
+    rotulo(svg, padL - 12, y + alturaBarra / 2, d.k, { anchor: 'end', fill: 'var(--ink)' });
+    const cor = tons[Math.min(i, tons.length - 1)];
+    const p = el('path', {
+      d: barraH(padL, y, Math.max(d.v * escala, 3), alturaBarra, 4), fill: cor,
+    }, svg);
+    rotulo(svg, padL + d.v * escala + 9, y + alturaBarra / 2, String(d.v),
+      { fill: 'var(--ink)', weight: 650, tabular: true, size: 12.5 });
+    p.style.cursor = 'default';
+    p.addEventListener('mousemove', (e) => mostrarTip(e,
+      `<b>${esc(d.k)}</b><br><span class="tk">Propostas perdidas:</span> <b>${d.v}</b><br>
+       <span class="tk">Do total não convertido:</span> <b>${(d.v / naoConv.length * 100).toFixed(0)}%</b>`));
+    p.addEventListener('mouseleave', esconderTip);
+  });
+}
+
+/* — conversão por faixa de volume: barras empilhadas, ênfase (1 tom + cinza) — */
+function chartFaixas() {
+  const svg = $('ch-faixas');
+  const faixas = [
+    { k: 'Até R$ 250 mil', min: 0, max: 250e3 },
+    { k: 'R$ 250 mil – 1 mi', min: 250e3, max: 1e6 },
+    { k: 'R$ 1 mi – 2,5 mi', min: 1e6, max: 2.5e6 },
+    { k: 'Acima de R$ 2,5 mi', min: 2.5e6, max: Infinity },
+  ].map((f) => {
+    const dentro = DADOS.filter((d) => d.volume_capturado >= f.min && d.volume_capturado < f.max);
+    const c = dentro.filter((d) => d.proposta_convertida === 'Sim').length;
+    return { ...f, total: dentro.length, conv: c, nao: dentro.length - c };
+  }).filter((f) => f.total > 0);
+
+  const padL = 160, padR = 56, alturaBarra = 26, gap = 12, topo = 4;
+  const W = 640, H = topo + faixas.length * (alturaBarra + gap);
+  svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+  svg.innerHTML = '';
+  const max = Math.max(...faixas.map((f) => f.total));
+  const escala = (W - padL - padR) / max;
+
+  faixas.forEach((f, i) => {
+    const y = topo + i * (alturaBarra + gap);
+    rotulo(svg, padL - 12, y + alturaBarra / 2, f.k, { anchor: 'end', fill: 'var(--ink)' });
+    const wConv = f.conv * escala, wNao = f.nao * escala;
+    const segs = [];
+    if (f.conv) segs.push({ x: padL, w: wConv, cor: 'var(--accent)', rot: 'Convertidas', n: f.conv });
+    // 2px de respiro entre os segmentos empilhados
+    if (f.nao) segs.push({ x: padL + wConv + (f.conv ? 2 : 0), w: Math.max(wNao - (f.conv ? 2 : 0), 2), cor: 'var(--neutral-mark)', rot: 'Não convertidas', n: f.nao });
+    segs.forEach((s, j) => {
+      const ultimo = j === segs.length - 1;
+      const p = el('path', { d: barraH(s.x, y, s.w, alturaBarra, ultimo ? 4 : 0), fill: s.cor }, svg);
+      p.addEventListener('mousemove', (e) => mostrarTip(e,
+        `<b>${esc(f.k)}</b><br><span class="tk">${s.rot}:</span> <b>${s.n}</b> de ${f.total}<br>
+         <span class="tk">Conversão da faixa:</span> <b>${(f.conv / f.total * 100).toFixed(0)}%</b>`));
+      p.addEventListener('mouseleave', esconderTip);
+    });
+    rotulo(svg, padL + f.total * escala + 10, y + alturaBarra / 2,
+      `${(f.conv / f.total * 100).toFixed(0)}%`, { fill: 'var(--ink)', weight: 650, tabular: true, size: 12.5 });
+  });
+}
+
+/* — IRV recomendado × fechado: halteres (antes → depois por proposta) — */
+function chartDumbbell() {
+  const svg = $('ch-dumbbell');
+  const dados = DADOS.filter((d) => d.proposta_convertida === 'Sim')
+    .sort((a, b) => b.volume_capturado - a.volume_capturado).slice(0, 12);
+
+  const padL = 108, padR = 96, linha = 30, topo = 26;
+  const W = 900, H = topo + dados.length * linha + 8;
+  svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+  svg.innerHTML = '';
+
+  const vals = dados.flatMap((d) => [d.irv_final_pricing_porc, d.irv_clm]);
+  const lo = Math.floor(Math.min(...vals) * 10) / 10, hi = Math.ceil(Math.max(...vals) * 10) / 10;
+  const x = (v) => padL + (v - lo) / (hi - lo) * (W - padL - padR);
+
+  // grade recuada + eixo
+  for (let t = lo; t <= hi + 1e-9; t += 0.2) {
+    el('line', { x1: x(t), y1: topo - 12, x2: x(t), y2: H - 6, stroke: 'var(--line-soft)', 'stroke-width': 1 }, svg);
+    rotulo(svg, x(t), topo - 20, pct(t, 1), { anchor: 'middle', fill: 'var(--ink-3)', size: 10.5, tabular: true });
+  }
+
+  dados.forEach((d, i) => {
+    const y = topo + i * linha + linha / 2;
+    rotulo(svg, padL - 14, y, d.id_proposta, { anchor: 'end', fill: 'var(--ink)', weight: 600, tabular: true });
+    const a = x(d.irv_final_pricing_porc), b = x(d.irv_clm);
+    el('line', { x1: a, y1: y, x2: b, y2: y, stroke: 'var(--neutral-mark)', 'stroke-width': 2, 'stroke-linecap': 'round' }, svg);
+    // anel na cor da superfície para os marcadores que se sobrepõem
+    el('circle', { cx: a, cy: y, r: 5.5, fill: 'var(--surface)', stroke: 'var(--neutral-mark)', 'stroke-width': 2.5 }, svg);
+    el('circle', { cx: b, cy: y, r: 5.5, fill: 'var(--accent)', stroke: 'var(--surface)', 'stroke-width': 2 }, svg);
+    const dif = d.irv_clm - d.irv_final_pricing_porc;
+    rotulo(svg, W - padR + 14, y, pp(dif),
+      { fill: dif >= 0 ? 'var(--good)' : 'var(--critical)', weight: 650, tabular: true, size: 11.5 });
+
+    const alvo = el('rect', { x: 0, y: y - linha / 2, width: W, height: linha, fill: 'transparent' }, svg);
+    alvo.addEventListener('mousemove', (e) => mostrarTip(e,
+      `<b>${esc(d.id_proposta)}</b> · ${esc(d.segmento)}<br>
+       <span class="tk">Volume:</span> <b>${brl.format(d.volume_capturado)}</b><br>
+       <span class="tk">IRV recomendado:</span> <b>${pct(d.irv_final_pricing_porc)}</b><br>
+       <span class="tk">IRV CLM:</span> <b>${pct(d.irv_clm)}</b> (${pp(dif)})`));
+    alvo.addEventListener('mouseleave', esconderTip);
+  });
+}
+
+/* ---------- tabela ---------- */
+function montarTabela() {
+  const tb = document.querySelector('#tbl tbody');
+  tb.innerHTML = DADOS.map((d) => {
+    const c = d.proposta_convertida === 'Sim';
+    return `<tr>
+      <td class="id"><button type="button" data-goto="${esc(d.id_proposta)}">${esc(d.id_proposta)}</button></td>
+      <td>${esc(d.segmento)}</td>
+      <td class="num">${brl.format(d.volume_capturado)}</td>
+      <td class="num">${pct(d.taxa_bruta_porc)}</td>
+      <td class="num">${pct(d.irv_final_pricing_porc)}</td>
+      <td><span class="tag ${c ? 'yes' : 'no'}"><i class="dot"></i>${c ? 'Sim' : 'Não'}</span></td>
+      <td class="num">${c ? pct(d.irv_clm) : '—'}</td>
+      <td class="num">${c ? pct(d.mdr_clm) : '—'}</td>
+      <td>${esc(d.motivo)}</td>
+    </tr>`;
+  }).join('');
+  tb.addEventListener('click', (e) => {
+    const b = e.target.closest('button[data-goto]');
+    if (b) { selSeg.value = ''; selConv.value = ''; selecionar(b.dataset.goto); }
+  });
+}
+
+/* ---------- início ---------- */
+limpar();
+</script>
